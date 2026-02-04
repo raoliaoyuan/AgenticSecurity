@@ -169,10 +169,10 @@ const ArchitectureViz = () => {
             iconColor: 'blue',
             threatCount: 12,
             components: [
-                { id: 'im_cn', name: '企业 IM 适配器', icon: 'MessageSquare', desc: '飞书/钉钉 Webhook 接入', features: ['消息去重', '附件预处理', '事件分发'], threats: ['LLM01:2025', 'LLM04:2025', 'MCP01'] },
-                { id: 'discord', name: 'Discord 适配器', icon: 'Link', desc: '外部社交渠道接入', features: ['WebSocket 持久化', '斜杠命令支持'], threats: ['LLM04:2025', 'MCP01', 'MCP05'] },
-                { id: 'line', name: 'Line 适配器', icon: 'MessageSquare', desc: '海外社交渠道接入', features: ['Messaging API 对接', '多媒体解析'], threats: ['LLM04:2025', 'MCP01', 'MCP05'] },
-                { id: 'web', name: 'Custom Web SDK', icon: 'Globe', desc: '自研内网 SDK', features: ['SSO 自动登录', '会话状态同步'], threats: ['LLM01:2025', 'LLM07:2025', 'LLM02:2025'] }
+                { id: 'im_cn', name: '企业 IM 适配器', icon: 'MessageSquare', desc: '飞书/钉钉/Teams Webhook 集成', features: ['消息去重与幂等', '消息签名验证', '事件分发路由'], threats: ['LLM01:2025', 'LLM04:2025', 'MCP01'] },
+                { id: 'custom_web', name: '自定义 Web 前端', icon: 'Globe', desc: '通过安全 REST API 与代理通信并支持人工干预流程的 Web 应用', features: ['Human-in-the-loop 审批', 'SSO 单点登录', '操作确认超时'], threats: ['LLM01:2025', 'LLM07:2025', 'LLM02:2025'] },
+                { id: 'event_driven', name: '事件驱动应用', icon: 'Zap', desc: '通过 Pub/Sub 发布业务事件启动系统间自动化工作流', features: ['事件订阅分发', 'Dead Letter Queue', '多系统编排'], threats: ['LLM04:2025', 'MCP01', 'MCP05'] },
+                { id: 'chat_interface', name: '临时对话界面', icon: 'MessageSquare', desc: '无状态调试与测试用途的轻量聊天界面，支持匿名会话', features: ['无状态会话', '调试日志输出', '工具调用测试'], threats: ['LLM04:2025', 'MCP01', 'MCP05'] }
             ]
         },
         {
@@ -185,10 +185,11 @@ const ArchitectureViz = () => {
             iconColor: 'purple',
             threatCount: 11,
             components: [
-                { id: 'gc', name: '意图编排引擎', icon: 'Cpu', desc: '意图解析与分发', features: ['Schema 强制转换', '语义解析', '路由仲裁'], threats: ['AG05', 'AG07', 'MCP04'] },
-                { id: 'iman', name: '身份管理器', icon: 'Lock', desc: 'SSO 映射与 JWT 签发', features: ['LDAP/AD 联通', 'SVID 签发', '角色映射'], threats: ['AG02', 'MCP05'] },
-                { id: 'ss', name: '安全护栏', icon: 'Shield', desc: '双向拦截与脱敏', features: ['注入指纹扫描', 'PII 自动掩码', '合规审计'], threats: ['LLM02', 'LLM06', 'LLM09'] },
-                { id: 'memory_svc', name: '记忆管理器', icon: 'Brain', desc: '记忆调度与分片', features: ['短期缓存控制', '长期记忆加载', '摘要生成'], threats: ['LLM03', 'AG06', 'MCP02'] }
+                { id: 'gc', name: '意图编排引擎', icon: 'Cpu', desc: '意图解析与分发', features: ['意图置信度阈值', '多意图冲突仲裁', '路由决策'], threats: ['AG05', 'AG07', 'MCP04'] },
+                { id: 'iman', name: '身份管理器', icon: 'Lock', desc: 'SSO 映射与 JWT 签发', features: ['LDAP/AD 联通', '动态权限降级', '角色映射'], threats: ['AG02', 'MCP05'] },
+                { id: 'ss', name: '安全护栏', icon: 'Shield', desc: '输入输出双向拦截与脱敏', features: ['注入指纹扫描', '输出幻觉检测', 'PII 自动掩码'], threats: ['LLM02', 'LLM06', 'LLM09'] },
+                { id: 'memory_svc', name: '记忆管理器', icon: 'Brain', desc: '记忆调度与分片', features: ['记忆过期策略', '敏感信息遗忘', '摘要生成'], threats: ['LLM03', 'AG06', 'MCP02'] },
+                { id: 'quota_mgr', name: '配额管理器', icon: 'Activity', desc: 'Token 消耗与 API 调用频率控制', features: ['成本预算管控', '调用频率限制', '用量告警'], threats: ['LLM10:2025', 'ASI08'] }
             ]
         },
         {
@@ -201,10 +202,9 @@ const ArchitectureViz = () => {
             iconColor: 'indigo',
             threatCount: 11,
             components: [
-                { id: 'fin_agent', name: '财务智能体', icon: 'Database', desc: '处理报销、预算逻辑', features: ['发票识别解析', '预决算分析', '合规初审'], threats: ['LLM06:2025', 'ASI03', 'ASI09'] },
-                { id: 'hr_agent', name: 'HR 智能体', icon: 'User', desc: '处理考勤、绩效逻辑', features: ['政策自动咨询', '考勤异常检测', '候选人筛选'], threats: ['LLM06:2025', 'LLM02:2025', 'ASI10'] },
-                { id: 'it_agent', name: 'IT 运维智能体', icon: 'Zap', desc: '处理权限与故障逻辑', features: ['工单自动分类', '权限链路追踪', '故障自愈建议'], threats: ['ASI02', 'ASI01', 'ASI05'] },
-                { id: 'gen_agent', name: '行政助理', icon: 'Bot', desc: '处理排程、预订逻辑', features: ['多方日程对齐', '资源冲突处理', '会议摘要推送'], threats: ['LLM01:2025', 'ASI07'] }
+                { id: 'orchestrator_agent', name: '编排智能体', icon: 'Cpu', desc: '负责意图路由、任务分发与输出质量监督的元级智能体', features: ['意图分类路由', '多智能体协作编排', '输出质量审核'], threats: ['AG05', 'ASI01', 'ASI07', 'ASI10'] },
+                { id: 'functional_agents', name: '职能智能体集群', icon: 'User', desc: '处理人财行等内部职能事务的业务智能体池', features: ['财务报销预算', 'HR考勤绩效', '行政排程预订'], threats: ['LLM06:2025', 'ASI03', 'ASI09', 'LLM02:2025'] },
+                { id: 'tech_agent', name: '技术智能体', icon: 'Zap', desc: '处理 IT 运维、权限管理与故障排查的技术类智能体', features: ['工单自动分类', '权限链路追踪', '故障自愈建议'], threats: ['ASI02', 'ASI01', 'ASI05'] }
             ]
         },
         {
@@ -217,10 +217,10 @@ const ArchitectureViz = () => {
             iconColor: 'amber',
             threatCount: 8,
             components: [
-                { id: 'rag_tool', name: 'RAG 检索器', icon: 'FileSearch', desc: '连接企业知识库', features: ['语义向量搜索', '引用源标注', '混合检索策略'], threats: ['LLM03', 'MCP02'] },
-                { id: 'sap_tool', name: 'SAP 连接器', icon: 'Layers', desc: 'ERP 业务系统接口', features: ['RFC 调用', 'IDoc 集成', '凭证自动录入'], threats: ['MCP01', 'AG04'] },
-                { id: 'py_sandbox', name: '计算沙箱', icon: 'Code2', desc: '隔离的数据计算环境', features: ['动态代码执行', '库依赖控制', '资源限制 (Quota)'], threats: ['AG08', 'MCP07'] },
-                { id: 'ext_api', name: '外部 API 桥接', icon: 'Globe', desc: '第三方服务网关', features: ['请求签名校验', '多级限流控制', '敏感词过滤'], threats: ['LLM05', 'MCP06'] }
+                { id: 'tool_registry', name: '工具注册中心', icon: 'TableProperties', desc: '统一管理工具元数据、版本与权限，支持动态发现', features: ['工具元数据管理', '版本控制', '权限分配'], threats: ['MCP02', 'MCP07'] },
+                { id: 'mcp_tools', name: 'MCP 工具服务', icon: 'Layers', desc: 'MCP 协议工具统一入口，包含数据库 Toolbox 与自定义后端防腐层', features: ['数据库安全访问', '后端 API 标准化', '参数化查询防注入'], threats: ['MCP01', 'MCP02', 'MCP03', 'MCP06'] },
+                { id: 'api_cli_gateway', name: 'API/CLI 网关', icon: 'Globe', desc: '外部服务调用网关，支持 REST API、GraphQL 及命令行工具', features: ['OAuth/HMAC 签名', '请求响应脱敏', '调用链路追踪'], threats: ['LLM05', 'MCP06', 'MCP04'] },
+                { id: 'rag_retriever', name: 'RAG 检索引擎', icon: 'FileSearch', desc: '企业知识库语义检索服务，支持多模态内容索引', features: ['向量相似度搜索', '引用源标注', '混合检索策略'], threats: ['LLM08:2025', 'MCP02'] }
             ]
         },
         {
@@ -233,10 +233,28 @@ const ArchitectureViz = () => {
             iconColor: 'slate',
             threatCount: 12,
             components: [
-                { id: 'mem_db', name: '对话历史库', icon: 'Save', desc: '用户历史加密存储', features: ['按 UID 物理隔离', '存量清理策略', '加密落盘'], threats: ['LLM02:2025', 'ASI06', 'ASI03'] },
-                { id: 'vector_db', name: '向量索引库', icon: 'RotateCw', desc: '语义记忆与知识库', features: ['多维 Embedding', '实时索引更新', '向量压缩'], threats: ['LLM08:2025', 'ASI06', 'LLM04:2025'] },
+                { id: 'cache_layer', name: '缓存层', icon: 'Zap', desc: 'Redis/Memcached 热点数据与会话状态缓存', features: ['热点数据加速', '会话状态存储', '限流计数器'], threats: ['ASI06', 'MCP08'] },
+                { id: 'mem_db', name: '对话历史库', icon: 'Save', desc: '用户历史加密存储', features: ['按 UID 物理隔离', '会话归档导出', '加密落盘'], threats: ['LLM02:2025', 'ASI06', 'ASI03'] },
+                { id: 'vector_db', name: '向量索引库', icon: 'RotateCw', desc: '语义记忆与知识库', features: ['索引版本管理', '增量更新', '向量压缩'], threats: ['LLM08:2025', 'ASI06', 'LLM04:2025'] },
                 { id: 'map_db', name: '身份关系库', icon: 'TableProperties', desc: '身份关联与映射表', features: ['跨平台 ID 映射', '账号生命周期', '权限快照'], threats: ['ASI03', 'ASI07', 'MCP04'] },
                 { id: 'ent_db', name: '核心数据库', icon: 'Database', desc: 'SAP/ERP 生产数据', features: ['行级权限控制', '审计追踪', '读写分离'], threats: ['LLM10:2025', 'MCP03', 'MCP06'] }
+            ]
+        },
+        {
+            id: 'infra',
+            title: '基础设施层 (Infrastructure Layer)',
+            functionalDesc: '底层运行时支撑，提供计算隔离、网络通信及存储服务等云原生基础能力。',
+            color: 'bg-emerald-500/10',
+            borderColor: 'border-emerald-500/20',
+            icon: 'Server',
+            iconColor: 'emerald',
+            threatCount: 8,
+            components: [
+                { id: 'compute_env', name: '计算环境', icon: 'Code2', desc: '代码执行沙箱与容器运行时，提供隔离的计算能力', features: ['资源 Quota 限制', '网络/文件隔离', '超时自动终止'], threats: ['ASI05', 'MCP07'] },
+                { id: 'network_env', name: '网络环境', icon: 'Globe', desc: '零信任网络、服务网格与安全通信通道', features: ['mTLS 双向认证', '微隔离策略', '流量加密传输'], threats: ['MCP08', 'LLM10:2025'] },
+                { id: 'storage_platform', name: '存储平台', icon: 'Database', desc: '对象存储、块存储及分布式文件系统基础服务', features: ['静态加密存储', '多副本冗余', '生命周期管理'], threats: ['ASI06', 'MCP03'] },
+                { id: 'secret_manager', name: '密钥管理服务', icon: 'Key', desc: '统一的凭据与密钥生命周期管理', features: ['HSM 硬件保护', '自动轮换策略', '访问审计日志'], threats: ['MCP04', 'ASI03'] },
+                { id: 'observability', name: '可观测性平台', icon: 'Activity', desc: '全链路监控、日志聚合与告警中心', features: ['分布式追踪', '指标聚合分析', '异常行为检测'], threats: ['MCP09', 'ASI08'] }
             ]
         }
     ], []);
