@@ -155,7 +155,7 @@ const ThreatSection = memo(({ section }) => (
 const ArchitectureViz = () => {
     const [activeStep, setActiveStep] = useState(null);
     const [showThreats, setShowThreats] = useState(true);
-    const [activeTab, setActiveTab] = useState('spec');
+    const [activeTab, setActiveTab] = useState('logical');
 
     // 使用 useMemo 缓存静态数据 - 将图标改为字符串标识
     const layers = useMemo(() => [
@@ -336,32 +336,35 @@ const ArchitectureViz = () => {
                         </div>
                         <p className="text-slate-400 text-xl font-medium ml-1">企业级 Agent 网关安全架构全链路解析 (V5.0)</p>
                     </div>
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-                            <button
-                                onClick={() => handleTabChange('spec')}
-                                className={`px-6 py-3 rounded-xl text-lg font-bold transition-colors duration-200 flex items-center gap-2 ${activeTab === 'spec' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                            >
-                                <Shield className="w-5 h-5" /> 功能视图
-                            </button>
-                            <button
-                                onClick={() => handleTabChange('global')}
-                                className={`px-6 py-3 rounded-xl text-lg font-bold transition-colors duration-200 flex items-center gap-2 ${activeTab === 'global' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                            >
-                                <Layers className="w-5 h-5" /> 逻辑视图
-                            </button>
-                        </div>
-                        <button
-                            onClick={handleToggleThreats}
-                            className={`px-6 py-3 rounded-xl text-lg font-bold transition-colors duration-200 flex items-center gap-3 border ${showThreats ? 'bg-red-500/20 border-red-500/50 text-red-100' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
-                        >
-                            <Skull className="w-6 h-6" />
-                            {showThreats ? '威胁透视内启' : '功能蓝图模式'}
-                        </button>
-                    </div>
                 </header>
 
-                {activeTab === 'spec' ? (
+                <div className="flex flex-wrap gap-2 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-fit">
+                    {[
+                        { id: 'logical', label: '逻辑架构', icon: Shield, color: 'blue' },
+                        { id: 'process', label: '运行架构', icon: Layers, color: 'purple' },
+                        { id: 'development', label: '开发架构', icon: Code2, color: 'indigo' },
+                        { id: 'data', label: '数据架构', icon: Database, color: 'cyan' },
+                        { id: 'physical', label: '物理架构', icon: Server, color: 'emerald' }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => handleTabChange(tab.id)}
+                            className={`px-5 py-2.5 rounded-xl text-base font-bold transition-all duration-200 flex items-center gap-2 ${activeTab === tab.id ? `bg-${tab.color}-600 text-white shadow-lg shadow-${tab.color}-900/20` : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+                        >
+                            <tab.icon className="w-4 h-4" /> {tab.label}
+                        </button>
+                    ))}
+                    <div className="w-px h-8 bg-white/10 mx-2 self-center"></div>
+                    <button
+                        onClick={handleToggleThreats}
+                        className={`px-5 py-2.5 rounded-xl text-base font-bold transition-colors duration-200 flex items-center gap-2 border ${showThreats ? 'bg-red-500/20 border-red-500/50 text-red-100' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
+                    >
+                        <Skull className="w-4 h-4" />
+                        {showThreats ? '威胁透视: ON' : '威胁透视: OFF'}
+                    </button>
+                </div>
+
+                {activeTab === 'logical' && (
                     <div className="space-y-6">
                         {layers.map((layer, idx) => (
                             <LayerSection
@@ -374,9 +377,11 @@ const ArchitectureViz = () => {
                             />
                         ))}
                     </div>
-                ) : (
-                    <GlobalArchView />
                 )}
+                {activeTab === 'process' && <ProcessView />}
+                {activeTab === 'development' && <DevelopmentView />}
+                {activeTab === 'data' && <DataView />}
+                {activeTab === 'physical' && <PhysicalView />}
 
                 {/* 威胁模型摘要 */}
                 {showThreats && (
@@ -430,7 +435,7 @@ const ArchitectureViz = () => {
 };
 
 
-const GlobalArchView = memo(() => {
+const ProcessView = memo(() => {
     return (
         <div className="space-y-8">
             {/* 标题 */}
@@ -439,8 +444,8 @@ const GlobalArchView = memo(() => {
                     <Layers className="text-purple-400 w-8 h-8" />
                 </div>
                 <div>
-                    <h3 className="text-3xl font-black text-white">企业级智能体逻辑架构</h3>
-                    <p className="text-slate-400 text-sm mt-1">参考 Google Multi-Agent AI System 架构设计</p>
+                    <h3 className="text-3xl font-black text-white">运行架构视图 (Process View)</h3>
+                    <p className="text-slate-400 text-sm mt-1">动态行为、Prompt 流转与 Agent 编排流程 (参考 Google Multi-Agent 架构)</p>
                 </div>
             </div>
 
@@ -892,3 +897,141 @@ const ArrowDown = memo(() => (
 ));
 
 export default ArchitectureViz;
+
+// --- 新增视图组件 ---
+
+const DevelopmentView = memo(() => (
+    <div className="space-y-8">
+        <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-indigo-500/20 rounded-2xl border border-indigo-500/30">
+                <Code2 className="text-indigo-400 w-8 h-8" />
+            </div>
+            <div>
+                <h3 className="text-3xl font-black text-white">开发架构视图 (Development View)</h3>
+                <p className="text-slate-400 text-sm mt-1">代码组织、模块依赖与构建流水线</p>
+            </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white/[0.03] border border-white/10 rounded-[2rem] p-8">
+                <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Layers className="w-5 h-5 text-indigo-400" /> 技术栈矩阵
+                </h4>
+                <div className="space-y-4">
+                    <DevStackItem label="Frontend" items={['React 18', 'Vite', 'Tailwind CSS', 'Lucide React']} />
+                    <DevStackItem label="Backend" items={['Python 3.11', 'FastAPI', 'LangChain', 'Pydantic']} />
+                    <DevStackItem label="Data" items={['PostgreSQL', 'Redis', 'Qdrant', 'MinIO']} />
+                    <DevStackItem label="Infra" items={['Docker', 'Kubernetes', 'Terraform', 'GitHub Actions']} />
+                </div>
+            </div>
+            <div className="bg-white/[0.03] border border-white/10 rounded-[2rem] p-8">
+                <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Code2 className="w-5 h-5 text-indigo-400" /> 模块结构
+                </h4>
+                <div className="font-mono text-sm text-slate-400 bg-black/20 p-6 rounded-xl border border-white/5">
+                    <div className="mb-2 text-indigo-400">src/</div>
+                    <div className="pl-4">├── <span className="text-slate-200">api/</span> <span className="text-slate-500">// REST & GraphQL endpoints</span></div>
+                    <div className="pl-4">├── <span className="text-slate-200">agents/</span> <span className="text-slate-500">// Intelligent agent logic</span></div>
+                    <div className="pl-4">├── <span className="text-slate-200">core/</span> <span className="text-slate-500">// Shared utilities & config</span></div>
+                    <div className="pl-4">├── <span className="text-slate-200">db/</span> <span className="text-slate-500">// Database models & migrations</span></div>
+                    <div className="pl-4">└── <span className="text-slate-200">web/</span> <span className="text-slate-500">// Frontend application</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+));
+
+const DevStackItem = ({ label, items }) => (
+    <div className="flex flex-col gap-2">
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
+        <div className="flex flex-wrap gap-2">
+            {items.map(i => <span key={i} className="text-xs font-medium text-indigo-200 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">{i}</span>)}
+        </div>
+    </div>
+);
+
+const DataView = memo(() => (
+    <div className="space-y-8">
+        <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-cyan-500/20 rounded-2xl border border-cyan-500/30">
+                <Database className="text-cyan-400 w-8 h-8" />
+            </div>
+            <div>
+                <h3 className="text-3xl font-black text-white">数据架构视图 (Data View)</h3>
+                <p className="text-slate-400 text-sm mt-1">核心实体关系与数据流转管道</p>
+            </div>
+        </div>
+        <div className="bg-[#0a0f1e] text-slate-300 p-8 rounded-[2rem] border border-white/10 overflow-x-auto">
+            <div className="min-w-[800px] flex justify-center gap-16">
+                <EntityNode name="User" fields={['UUID', 'Role', 'SVID']} />
+                <div className="flex items-center text-slate-600">── 1:N ──</div>
+                <EntityNode name="Session" fields={['SessionID', 'Context', 'History']} />
+                <div className="flex items-center text-slate-600">── 1:N ──</div>
+                <EntityNode name="Memory" fields={['VectorID', 'Embedding', 'Metadata']} />
+            </div>
+            <div className="flex justify-center my-8">
+                <div className="h-16 border-l border-dashed border-slate-600"></div>
+            </div>
+            <div className="min-w-[800px] flex justify-center gap-16">
+                <EntityNode name="Agent" fields={['AgentID', 'Tools', 'Prompt']} color="purple" />
+                <div className="flex items-center text-slate-600">── Uses ──</div>
+                <EntityNode name="Tool" fields={['ToolID', 'Schema', 'ACL']} color="amber" />
+            </div>
+        </div>
+    </div>
+));
+
+const EntityNode = ({ name, fields, color = 'cyan' }) => (
+    <div className={`bg-${color}-500/5 border border-${color}-500/30 p-4 rounded-xl min-w-[180px]`}>
+        <div className={`text-${color}-400 font-bold mb-3 border-b border-${color}-500/20 pb-2 text-center`}>{name}</div>
+        <div className="space-y-1">
+            {fields.map(f => <div key={f} className="text-xs text-slate-400 font-mono">+ {f}</div>)}
+        </div>
+    </div>
+);
+
+const PhysicalView = memo(() => (
+    <div className="space-y-8">
+        <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
+                <Server className="text-emerald-400 w-8 h-8" />
+            </div>
+            <div>
+                <h3 className="text-3xl font-black text-white">物理架构视图 (Physical View)</h3>
+                <p className="text-slate-400 text-sm mt-1">云原生部署拓扑与网络边界</p>
+            </div>
+        </div>
+        <div className="bg-slate-900 border border-white/10 rounded-[2rem] p-8 relative overflow-hidden">
+            <div className="absolute top-4 left-4 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded text-xs font-bold border border-emerald-500/30">AWS / Google Cloud Region</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                <ZoneBox name="Public Subnet (DMZ)">
+                    <InfraComponent name="Load Balancer (WAF)" icon={<Globe />} />
+                    <InfraComponent name="API Gateway" icon={<Link />} />
+                </ZoneBox>
+                <ZoneBox name="Private App Subnet">
+                    <InfraComponent name="Kubernetes Cluster (GKE/EKS)" icon={<Server />} count={3} />
+                    <InfraComponent name="Agent Replicas" icon={<Bot />} count={12} />
+                </ZoneBox>
+                <ZoneBox name="Private Data Subnet">
+                    <InfraComponent name="Vector DB Cluster" icon={<Database />} />
+                    <InfraComponent name="PostgreSQL Primary" icon={<Database />} />
+                    <InfraComponent name="Redis Cache" icon={<Zap />} />
+                </ZoneBox>
+            </div>
+        </div>
+    </div>
+));
+
+const ZoneBox = ({ name, children }) => (
+    <div className="border border-dashed border-slate-600/50 rounded-xl p-6 bg-black/20">
+        <div className="text-xs font-bold text-slate-500 uppercase mb-4">{name}</div>
+        <div className="space-y-4">{children}</div>
+    </div>
+);
+
+const InfraComponent = ({ name, icon, count }) => (
+    <div className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+        <div className="text-slate-400">{icon}</div>
+        <div className="text-sm font-medium text-slate-200">{name}</div>
+        {count && <div className="ml-auto text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">{count} nodes</div>}
+    </div>
+);
