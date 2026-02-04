@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
+import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import {
     Shield,
     User,
@@ -43,24 +44,24 @@ const getIcon = (iconName, className) => {
 // Memoized 组件卡片
 const ComponentCard = memo(({ comp, isActive, onMouseEnter, onMouseLeave, showThreats }) => (
     <div
-        className={`group/card relative bg-white/[0.03] border border-white/10 rounded-3xl p-6 transition-colors duration-200 ${isActive ? 'bg-white/[0.08] border-white/30' : 'hover:bg-white/[0.05]'}`}
+        className={`group/card relative bg-white border border-slate-200 rounded-2xl p-6 transition-all duration-300 ${isActive ? 'ring-2 ring-blue-500 shadow-xl shadow-blue-100' : 'hover:shadow-lg hover:border-blue-200 shadow-sm'}`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
     >
         <div className="flex items-center gap-3 mb-4">
-            <div className="p-2.5 bg-blue-500/20 rounded-xl text-blue-300 border border-blue-500/30">
+            <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600 border border-blue-100">
                 {getIcon(comp.icon, 'w-6 h-6')}
             </div>
-            <span className="font-black text-xl text-white">{comp.name}</span>
+            <span className="font-black text-xl text-slate-900">{comp.name}</span>
         </div>
-        <p className="text-base text-slate-400 leading-relaxed mb-6 font-medium">{comp.desc}</p>
+        <p className="text-base text-slate-500 leading-relaxed mb-6 font-medium">{comp.desc}</p>
 
         {/* 关键特性 */}
         <div className="space-y-3 mb-6">
-            <div className="text-sm font-black text-white/20 uppercase tracking-widest">关键特性</div>
+            <div className="text-xs font-black text-slate-300 uppercase tracking-widest">关键特性</div>
             <div className="flex flex-wrap gap-2">
                 {comp.features.map(f => (
-                    <span key={f} className="text-xs bg-white/5 text-slate-300 px-2.5 py-1 rounded-lg border border-white/10 group-hover/card:border-blue-500/30 transition-colors">
+                    <span key={f} className="text-xs bg-slate-50 text-slate-600 px-2.5 py-1 rounded-lg border border-slate-200 group-hover/card:border-blue-500/30 transition-colors">
                         • {f}
                     </span>
                 ))}
@@ -68,9 +69,9 @@ const ComponentCard = memo(({ comp, isActive, onMouseEnter, onMouseLeave, showTh
         </div>
 
         {showThreats && comp.threats && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-5 border-t border-white/5">
+            <div className="flex flex-wrap gap-2 mt-4 pt-5 border-t border-slate-100">
                 {comp.threats.map(t => (
-                    <span key={t} className="text-sm font-black px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 flex items-center gap-1.5 hover:bg-red-500/20 transition-colors">
+                    <span key={t} className="text-sm font-black px-2.5 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 flex items-center gap-1.5 hover:bg-red-100 transition-colors">
                         <AlertTriangle className="w-4 h-4" /> {t}
                     </span>
                 ))}
@@ -86,19 +87,19 @@ const LayerSection = memo(({ layer, isLast, activeStep, setActiveStep, showThrea
 
     return (
         <div className="group relative">
-            <div className={`border ${layer.borderColor} ${layer.color} rounded-[2.5rem] p-8 transition-colors duration-200 hover:bg-white/[0.08]`}>
+            <div className={`border ${layer.borderColor} ${layer.color} rounded-[2.5rem] p-8 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200 hover:bg-white`}>
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
-                            {getIcon(layer.icon, `w-8 h-8 text-${layer.iconColor}-400`)}
+                        <div className={`p-4 bg-white rounded-2xl border ${layer.borderColor} shadow-sm`}>
+                            {getIcon(layer.icon, `w-8 h-8 text-${layer.iconColor}-600`)}
                         </div>
                         <div>
-                            <h2 className="text-lg font-black text-white/40 uppercase tracking-[0.4em] mb-1">{layer.title}</h2>
-                            <p className="text-lg text-slate-300 font-medium">{layer.functionalDesc}</p>
+                            <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-1">{layer.title}</h2>
+                            <p className="text-xl text-slate-800 font-black tracking-tight">{layer.functionalDesc}</p>
                         </div>
                     </div>
                     {showThreats && (
-                        <div className="hidden lg:flex items-center gap-3 text-base text-red-400 font-black bg-red-400/10 px-4 py-2 rounded-full border border-red-400/20">
+                        <div className="hidden lg:flex items-center gap-3 text-sm text-red-600 font-black bg-white px-4 py-2 rounded-xl border border-red-100 shadow-sm shadow-red-50">
                             <Activity className="w-5 h-5" />
                             覆盖威胁节点: {layer.threatCount} 个
                         </div>
@@ -130,9 +131,9 @@ const LayerSection = memo(({ layer, isLast, activeStep, setActiveStep, showThrea
 // Memoized 威胁列表项
 const ThreatItem = memo(({ threat, color }) => (
     <div className="group/threat flex gap-4 transition-transform hover:translate-x-1">
-        <span className={`text-base font-black text-${color}-400 bg-${color}-400/10 px-2 py-1 rounded-lg h-fit border border-${color}-400/20`}>{threat.id}</span>
+        <span className={`text-base font-black text-${color}-600 bg-${color}-50 px-2 py-1 rounded-lg h-fit border border-${color}-200`}>{threat.id}</span>
         <div>
-            <div className="text-lg font-black text-slate-200 group-hover/threat:text-white transition-colors">{threat.name}</div>
+            <div className="text-lg font-black text-slate-700 group-hover/threat:text-slate-900 transition-colors">{threat.name}</div>
             <p className="text-sm text-slate-500 font-medium">{threat.desc}</p>
         </div>
     </div>
@@ -140,9 +141,9 @@ const ThreatItem = memo(({ threat, color }) => (
 
 // Memoized 威胁模型摘要
 const ThreatSection = memo(({ section }) => (
-    <div className="bg-white/[0.02] p-8 rounded-[2rem] border border-white/5">
-        <h3 className="text-2xl font-black text-white mb-6 flex items-center gap-3">
-            {section.icon} {section.title}
+    <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
+        <h3 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
+            {React.cloneElement(section.icon, { className: 'w-6 h-6' })} {section.title}
         </h3>
         <div className="space-y-5">
             {section.list.map(t => (
@@ -157,14 +158,14 @@ const ArchitectureViz = () => {
     const [showThreats, setShowThreats] = useState(true);
     const [activeTab, setActiveTab] = useState('logical');
 
-    // 使用 useMemo 缓存静态数据 - 将图标改为字符串标识
+    // 使用 useMemo 缓存静态数据
     const layers = useMemo(() => [
         {
             id: 'access',
             title: '接入层 (Access Layer)',
             functionalDesc: '负责多渠道请求的接收、初步格式化与身份初识，作为系统的物理安全边界。',
-            color: 'bg-blue-500/10',
-            borderColor: 'border-blue-500/20',
+            color: 'bg-blue-50',
+            borderColor: 'border-blue-200',
             icon: 'Globe',
             iconColor: 'blue',
             threatCount: 12,
@@ -179,8 +180,8 @@ const ArchitectureViz = () => {
             id: 'gateway',
             title: '控制平面 (Control Plane)',
             functionalDesc: '系统的神经中枢，执行安全护栏、身份映射、意图编排及会话记忆的动态调度。',
-            color: 'bg-purple-500/10',
-            borderColor: 'border-purple-500/20',
+            color: 'bg-purple-50',
+            borderColor: 'border-purple-200',
             icon: 'Shield',
             iconColor: 'purple',
             threatCount: 11,
@@ -196,8 +197,8 @@ const ArchitectureViz = () => {
             id: 'agents',
             title: '智能体层 (Agent Layer)',
             functionalDesc: '智能决策层，基于特定业务逻辑和上下文记忆进行推理，并向工具层下达执行指令。',
-            color: 'bg-indigo-500/10',
-            borderColor: 'border-indigo-500/20',
+            color: 'bg-indigo-50',
+            borderColor: 'border-indigo-200',
             icon: 'Bot',
             iconColor: 'indigo',
             threatCount: 11,
@@ -211,8 +212,8 @@ const ArchitectureViz = () => {
             id: 'tools',
             title: '工具层 (Tool Layer)',
             functionalDesc: '物理执行层，提供标准化接口连接企业内部系统、外部服务或执行隔离的计算逻辑。',
-            color: 'bg-amber-500/10',
-            borderColor: 'border-amber-500/20',
+            color: 'bg-amber-50',
+            borderColor: 'border-amber-200',
             icon: 'Hammer',
             iconColor: 'amber',
             threatCount: 8,
@@ -227,8 +228,8 @@ const ArchitectureViz = () => {
             id: 'data',
             title: '数据与存储层 (Storage Layer)',
             functionalDesc: '持久化底座，确保对话历史、知识索引、身份关系及生产数据的全生命周期安全。',
-            color: 'bg-slate-500/10',
-            borderColor: 'border-slate-500/20',
+            color: 'bg-slate-100',
+            borderColor: 'border-slate-300',
             icon: 'Database',
             iconColor: 'slate',
             threatCount: 12,
@@ -242,10 +243,10 @@ const ArchitectureViz = () => {
         },
         {
             id: 'infra',
-            title: '基础设施层 (Infrastructure Layer)',
+            title: '基础设施层 (Infra Layer)',
             functionalDesc: '底层运行时支撑，提供计算隔离、网络通信及存储服务等云原生基础能力。',
-            color: 'bg-emerald-500/10',
-            borderColor: 'border-emerald-500/20',
+            color: 'bg-emerald-50',
+            borderColor: 'border-emerald-200',
             icon: 'Server',
             iconColor: 'emerald',
             threatCount: 8,
@@ -265,36 +266,36 @@ const ArchitectureViz = () => {
             { id: 'LLM02:2025', name: 'Sensitive Info Disclosure', desc: '不当暴露 PII、凭据或系统指令' },
             { id: 'LLM03:2025', name: 'Supply Chain Risks', desc: '训练集、基础模型或工具库供应链投毒' },
             { id: 'LLM04:2025', name: 'Data & Model Poisoning', desc: '操作训练、微调或嵌入数据以改变行为' },
-            { id: 'LLM05:2025', name: 'Improper Output Handling', desc: '输出缺乏清理导致的 SSRF、XSS 或指令劫持' },
+            { id: 'LLM05:2025', name: 'Improper Output Handling', desc: '输出导致 SSRF、XSS 或指令劫持' },
             { id: 'LLM06:2025', name: 'Excessive Agency', desc: '赋予模型过多的工具权限、自主权或信任度' },
-            { id: 'LLM07:2025', name: 'System Prompt Leakage', desc: '泄露系统初始指令以获取绕过护栏的方法' },
-            { id: 'LLM08:2025', name: 'Vector & Embedding Weaknesses', desc: '针对 RAG 向量存储的噪声注入或冲突攻击' },
-            { id: 'LLM09:2025', name: 'Misinformation', desc: '产生误导、虚假且具有说服力的内容 (幻觉)' },
-            { id: 'LLM10:2025', name: 'Unbounded Consumption', desc: '恶意构造请求导致配额耗尽或拒绝服务' }
+            { id: 'LLM07:2025', name: 'System Prompt Leakage', desc: '泄露系统初始指令' },
+            { id: 'LLM08:2025', name: 'Vector Weaknesses', desc: '针对 RAG 向量存储的攻击' },
+            { id: 'LLM09:2025', name: 'Misinformation', desc: '产生误导、虚假且具有说服力的内容' },
+            { id: 'LLM10:2025', name: 'Unbounded Consumption', desc: '恶意请求导致配额耗尽' }
         ],
         agentic: [
             { id: 'ASI01', name: 'Agent Goal Hijack', desc: '篡改智能体任务清单或偏离设计初衷' },
-            { id: 'ASI02', name: 'Tool Misuse & Exploitation', desc: '智能体由于对工具参数缺乏校验导致的滥用' },
-            { id: 'ASI03', name: 'Identity & Privilege Abuse', desc: '身份继承漏洞或跨代理级别的权限提升' },
-            { id: 'ASI04', name: 'Agentic Supply Chain', desc: '加载了包含恶意逻辑的第三方智能体或 Persona' },
-            { id: 'ASI05', name: 'Unexpected Code Execution', desc: '智能体自主生成并执行了未经审计的脚本' },
-            { id: 'ASI06', name: 'Memory & Context Poisoning', desc: '在长期记忆或上下文中注入恶意知识' },
-            { id: 'ASI07', name: 'Insecure Inter-Agent Comm', desc: '多代理协作中的消息篡改、劫持或伪造' },
-            { id: 'ASI08', name: 'Cascading Failures', desc: '单个节点受控引发的自动化链路整体瘫痪' },
-            { id: 'ASI09', name: 'Human-Agent Trust Exploit', desc: '利用用户对智能体的过度信赖诱导危险授权' },
-            { id: 'ASI10', name: 'Rogue Agents', desc: '自发的、违反对齐协议的不符合安全约束的行为' }
+            { id: 'ASI02', name: 'Tool Misuse', desc: '对工具参数缺乏校验导致的滥用' },
+            { id: 'ASI03', name: 'Identity Abuse', desc: '身份继承漏洞或跨代理级别的权限提升' },
+            { id: 'ASI04', name: 'Agentic Supply Chain', desc: '恶意第三方智能体或 Persona' },
+            { id: 'ASI05', name: 'Unexpected Execution', desc: '自主执行未经审计的脚本' },
+            { id: 'ASI06', name: 'Memory Poisoning', desc: '在长期记忆或上下文中注入恶意知识' },
+            { id: 'ASI07', name: 'Insecure Comm', desc: '协作中的消息篡改、劫持或伪造' },
+            { id: 'ASI08', name: 'Cascading Failures', desc: '单个节点受控引发整体瘫痪' },
+            { id: 'ASI09', name: 'Trust Exploit', desc: '利用用户对智能体的信赖诱导危险授权' },
+            { id: 'ASI10', name: 'Rogue Agents', desc: '违反安全约束的行为' }
         ],
         mcp: [
-            { id: 'MCP01', name: 'Indirect Prompt Injection', desc: '通过恶意 MCP 资源内容注入指令' },
-            { id: 'MCP02', name: 'Tool Poisoning', desc: '工具 Meta 定义被篡改以引入恶意逻辑' },
-            { id: 'MCP03', name: 'Excessive Permissions', desc: 'MCP Server 权限分配过大且缺乏 RBAC' },
-            { id: 'MCP04', name: 'Auth/Credential Theft', desc: 'API Token 在协议传输或存储中泄露' },
-            { id: 'MCP05', name: 'Tool Shadowing', desc: '恶意 MCP Server 拦截或重定向合规调用' },
-            { id: 'MCP06', name: 'Command/SQL Injection', desc: '工具接口缺乏对输入参数的强隔离与清理' },
-            { id: 'MCP07', name: 'Rug Pull Attacks', desc: '信任工具在更新后突然改变其安全行为' },
-            { id: 'MCP08', name: 'Broken Auth & Authz', desc: 'Server 间缺乏有效的相互认证机制' },
-            { id: 'MCP09', name: 'Lack of Audit & Telemetry', desc: '跨协议边界的调用缺乏全链路追踪记录' },
-            { id: 'MCP10', name: 'reasoning Integrity Failure', desc: '推理幻觉导致的错误的工具调用参数组合' }
+            { id: 'MCP01', name: 'Indirect Injection', desc: '通过恶意 MCP 资源内容注入指令' },
+            { id: 'MCP02', name: 'Tool Poisoning', desc: '工具定义被篡改以引入恶意逻辑' },
+            { id: 'MCP03', name: 'Excessive Permissions', desc: '服务器权限分配过大且缺乏 RBAC' },
+            { id: 'MCP04', name: 'Credential Theft', desc: 'API Token 在协议传输中泄露' },
+            { id: 'MCP05', name: 'Tool Shadowing', desc: '恶意服务器拦截合规调用' },
+            { id: 'MCP06', name: 'Injection', desc: '接口缺乏对输入参数的清理' },
+            { id: 'MCP07', name: 'Rug Pull Attacks', desc: '信任工具在更新后改变行为' },
+            { id: 'MCP08', name: 'Broken Auth', desc: '服务器间缺乏相互认证机制' },
+            { id: 'MCP09', name: 'Lack of Audit', desc: '跨协议边界的调用缺乏追踪记录' },
+            { id: 'MCP10', name: 'Integrity Failure', desc: '错误的工具调用参数组合' }
         ]
     }), []);
 
@@ -318,27 +319,30 @@ const ArchitectureViz = () => {
     ], []);
 
     return (
-        <div className="min-h-screen bg-[#020617] p-6 font-sans text-slate-200 leading-normal selection:bg-blue-500/30">
-            {/* Background - 简化背景，移除动画 */}
-            <div className="fixed inset-0 bg-gradient-to-br from-blue-900/5 to-purple-900/5 pointer-events-none"></div>
+        <div className="min-h-screen bg-slate-50 p-6 font-sans text-slate-900 leading-normal selection:bg-blue-200">
+            {/* Background Texture */}
+            <div className="fixed inset-0 pointer-events-none opacity-[0.4]" style={{
+                backgroundImage: `radial-gradient(#cbd5e1 0.5px, transparent 0.5px)`,
+                backgroundSize: '24px 24px'
+            }}></div>
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
-                <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/5 pb-8">
+                <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-slate-200 pb-8">
                     <div>
                         <div className="flex items-center gap-4 mb-2">
-                            <div className="p-3 bg-blue-600/20 border border-blue-500/40 rounded-2xl">
-                                <Shield className="text-blue-400 w-10 h-10" />
+                            <div className="p-3 bg-blue-600 text-white shadow-xl shadow-blue-200 rounded-2xl">
+                                <Shield className="w-10 h-10" />
                             </div>
-                            <h1 className="text-5xl font-black text-white tracking-tight">
-                                Antigravity <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Agent SPEC</span>
+                            <h1 className="text-5xl font-black text-slate-900 tracking-tight">
+                                AgenticSecurity <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Blueprint</span>
                             </h1>
                         </div>
-                        <p className="text-slate-400 text-xl font-medium ml-1">企业级 Agent 网关安全架构全链路解析 (V5.0)</p>
+                        <p className="text-slate-500 text-xl font-medium ml-1">企业级 Agent 安全架构全链路解析 (V5.0)</p>
                     </div>
                 </header>
 
-                <div className="flex flex-wrap gap-2 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-fit">
+                <div className="flex flex-wrap gap-2 mb-8 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm w-fit">
                     {[
                         { id: 'logical', label: '逻辑架构', icon: Shield, color: 'blue' },
                         { id: 'process', label: '运行架构', icon: Layers, color: 'purple' },
@@ -349,15 +353,15 @@ const ArchitectureViz = () => {
                         <button
                             key={tab.id}
                             onClick={() => handleTabChange(tab.id)}
-                            className={`px-5 py-2.5 rounded-xl text-base font-bold transition-all duration-200 flex items-center gap-2 ${activeTab === tab.id ? `bg-${tab.color}-600 text-white shadow-lg shadow-${tab.color}-900/20` : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+                            className={`px-5 py-2.5 rounded-xl text-base font-black transition-all duration-200 flex items-center gap-2 ${activeTab === tab.id ? `bg-${tab.color}-600 text-white shadow-lg shadow-${tab.color}-200` : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                         >
                             <tab.icon className="w-4 h-4" /> {tab.label}
                         </button>
                     ))}
-                    <div className="w-px h-8 bg-white/10 mx-2 self-center"></div>
+                    <div className="w-px h-8 bg-slate-200 mx-2 self-center"></div>
                     <button
                         onClick={handleToggleThreats}
-                        className={`px-5 py-2.5 rounded-xl text-base font-bold transition-colors duration-200 flex items-center gap-2 border ${showThreats ? 'bg-red-500/20 border-red-500/50 text-red-100' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
+                        className={`px-5 py-2.5 rounded-xl text-base font-black transition-colors duration-200 flex items-center gap-2 border ${showThreats ? 'bg-red-50 border-red-200 text-red-600 shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                     >
                         <Skull className="w-4 h-4" />
                         {showThreats ? '威胁透视: ON' : '威胁透视: OFF'}
@@ -440,268 +444,445 @@ const ProcessView = memo(() => {
         <div className="space-y-8">
             {/* 标题 */}
             <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-purple-500/20 rounded-2xl border border-purple-500/30">
-                    <Layers className="text-purple-400 w-8 h-8" />
+                <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl border border-purple-100 shadow-sm shadow-purple-100">
+                    <Layers className="w-8 h-8" />
                 </div>
                 <div>
-                    <h3 className="text-3xl font-black text-white">运行架构视图 (Process View)</h3>
-                    <p className="text-slate-400 text-sm mt-1">动态行为、Prompt 流转与 Agent 编排流程 (参考 Google Multi-Agent 架构)</p>
+                    <h3 className="text-3xl font-black text-slate-900">运行架构视图 (Process View)</h3>
+                    <p className="text-slate-500 text-sm mt-1">动态行为、Prompt 流转与 Agent 编排流程 (参考 Google Multi-Agent 架构)</p>
                 </div>
             </div>
 
-            {/* 主架构图 */}
-            <div className="relative bg-[#0a0f1e] rounded-[2rem] border border-white/10 p-8 overflow-x-auto">
-                <div className="min-w-[1000px] flex flex-col items-center gap-6">
+            {/* 主架构图 - 三栏式布局 */}
+            <div className="relative bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-xl shadow-slate-200/50 overflow-x-auto">
+                <div className="min-w-[1100px] relative">
+                    <Xwrapper>
 
-                    {/* 用户入口区域 */}
-                    <div className="flex gap-16 items-end">
-                        <UserNode title="应用用户" subtitle="Application Users" icon={<User />} />
-                        <UserNode title="AI 开发者" subtitle="AI Developers" icon={<Code2 />} />
-                    </div>
+                        {/* SVG 连接层 - 位于最底层 */}
 
-                    {/* 连接线与标注 */}
-                    <div className="flex gap-40">
-                        <FlowLabel label="Prompt" step="1" />
-                        <FlowLabel label="ADK" />
-                    </div>
-                    <ArrowDownSimple />
 
-                    {/* 企业环境大框 */}
-                    <div className="w-full bg-blue-500/5 border-2 border-blue-500/30 rounded-[2rem] p-6 relative">
-                        <div className="absolute -top-4 left-8 bg-blue-600 px-4 py-1.5 rounded-full text-sm font-black text-white tracking-wide">
-                            Enterprise Environment
+
+                        {/* 用户入口区域 */}
+                        <div className="flex justify-center gap-20 mb-6 relative z-10">
+                            <UserNode title="应用用户" subtitle="Application Users" icon={<User />} />
+                            <UserNode title="AI 开发者" subtitle="AI Developers" icon={<Code2 />} />
                         </div>
 
-                        {/* Region 标识 */}
-                        <div className="absolute top-4 left-6 text-xs text-blue-400/60 font-bold">Region</div>
+                        {/* 流程入口标注 */}
+                        <div className="flex flex-col items-center mb-6 relative z-10">
+                            <FlowLabel label="Step 1: Prompt Request" />
+                            <ArrowDownTiny />
+                        </div>
 
-                        <div className="flex flex-col gap-6 mt-4">
-                            {/* 接入层 */}
-                            <div className="flex justify-center">
-                                <LogicNode
-                                    title="接入层"
-                                    subtitle="Frontend Services"
-                                    icon={<Globe />}
-                                    color="blue"
-                                    items={['企业 IM 适配器', 'Web 前端', '事件驱动应用', '临时对话界面']}
-                                />
+                        {/* 企业环境大框 */}
+                        <div className="bg-gradient-to-b from-blue-50/80 to-slate-50/50 border-2 border-blue-200 rounded-[2rem] p-6 relative z-10">
+                            <div className="absolute -top-4 left-8 bg-blue-600 px-5 py-2 rounded-full text-sm font-black text-white tracking-widest shadow-lg shadow-blue-200 flex items-center gap-2">
+                                <Shield className="w-4 h-4" /> ENTERPRISE ENVIRONMENT
                             </div>
 
-                            <FlowLabel label="Human-in-the-loop" step="2" centered />
-                            <ArrowDownSimple />
+                            {/* 三栏式主体布局 */}
+                            <div className="grid grid-cols-12 gap-4 mt-6">
 
-                            {/* 智能体区域 - Agents */}
-                            <div className="flex gap-8">
-                                {/* 左侧：控制平面 + 智能体层 */}
-                                <div className="flex-1 bg-emerald-500/5 border-2 border-emerald-500/30 rounded-[1.5rem] p-5 relative">
-                                    <div className="absolute -top-3 left-6 bg-emerald-600 px-3 py-1 rounded-full text-xs font-black text-white">Agents</div>
-
-                                    <div className="flex flex-col items-center gap-4 mt-3">
-                                        {/* Coordinator Agent */}
-                                        <CoordinatorNode />
-
-                                        <FlowLabel label="Subagent invocation" step="3" centered />
-                                        <ArrowDownSimple />
-
-                                        {/* 子代理编排区域 */}
-                                        <div className="w-full border border-dashed border-emerald-500/30 rounded-xl p-4">
-                                            <div className="flex gap-6 justify-center flex-wrap">
-                                                {/* 顺序执行链 */}
-                                                <div className="flex flex-col items-center gap-3">
-                                                    <div className="text-xs text-slate-500 font-bold">Sequence</div>
-                                                    <SubagentNode title="职能代理" subtitle="Task-A" color="emerald" />
-                                                    <ArrowDownTiny />
-                                                    <SubagentNode title="技术代理" subtitle="Task-A.1" color="emerald" />
-                                                </div>
-
-                                                {/* 迭代优化链 */}
-                                                <div className="flex flex-col items-center gap-3">
-                                                    <div className="text-xs text-slate-500 font-bold">Iterative refinement</div>
-                                                    <SubagentNode title="任务代理" subtitle="Task-B" color="emerald" />
-                                                    <div className="flex gap-3 items-center">
-                                                        <ArrowDownTiny />
-                                                        <div className="text-xs text-slate-600">Updated prompt</div>
-                                                    </div>
-                                                    <div className="flex gap-4">
-                                                        <SubagentNode title="质量评估" subtitle="Quality evaluator" color="orange" small />
-                                                        <SubagentNode title="提示增强" subtitle="Prompt enhancer" color="purple" small />
-                                                    </div>
-                                                    <div className="text-xs text-red-400/60 italic">If rework is required</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <FlowLabel label="Response" step="4" centered />
-                                        <ArrowDownSimple />
-
-                                        {/* 响应生成器 */}
-                                        <SubagentNode title="响应生成器" subtitle="Response Generator" color="emerald" highlight />
-                                    </div>
+                                {/* 左列：控制平面 */}
+                                <div className="col-span-3">
+                                    <ControlPlanePanel />
                                 </div>
 
-                                {/* 右侧：模型运行时 */}
-                                <div className="w-72 flex flex-col gap-4">
-                                    {/* Model Armor */}
-                                    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Shield className="w-5 h-5 text-red-400" />
-                                            <span className="font-bold text-white text-sm">安全护栏</span>
-                                        </div>
-                                        <div className="text-xs text-red-300/70">Model Armor</div>
-                                        <div className="flex flex-wrap gap-1 mt-2">
-                                            <span className="text-xs bg-red-500/20 px-2 py-0.5 rounded text-red-300">注入检测</span>
-                                            <span className="text-xs bg-red-500/20 px-2 py-0.5 rounded text-red-300">PII 脱敏</span>
-                                        </div>
-                                    </div>
+                                {/* 中列：智能体编排层 */}
+                                <div className="col-span-6">
+                                    <AgentOrchestrationPanel />
+                                </div>
 
-                                    <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-                                        <span>Inference requests</span>
-                                        <span>↔</span>
-                                        <span>responses</span>
-                                    </div>
-
-                                    {/* 模型运行时 */}
-                                    <div className="bg-slate-500/10 border border-slate-500/30 rounded-xl p-4">
-                                        <div className="text-xs text-slate-400 mb-2 font-bold">Model runtime:</div>
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <Brain className="w-5 h-5 text-blue-400" />
-                                            <span className="font-bold text-white text-sm">AI 模型</span>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <RuntimeOption label="Vertex AI" />
-                                            <RuntimeOption label="Cloud Run" />
-                                            <RuntimeOption label="GKE" />
-                                        </div>
-                                    </div>
-
-                                    {/* 控制平面组件 */}
-                                    <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
-                                        <div className="text-xs text-purple-400 mb-2 font-bold">Control Plane:</div>
-                                        <div className="space-y-2">
-                                            <ControlPlaneItem icon={<Cpu />} title="意图编排引擎" />
-                                            <ControlPlaneItem icon={<Lock />} title="身份管理器" />
-                                            <ControlPlaneItem icon={<Brain />} title="记忆管理器" />
-                                            <ControlPlaneItem icon={<Activity />} title="配额管理器" />
-                                        </div>
-                                    </div>
+                                {/* 右列：模型运行时 */}
+                                <div className="col-span-3">
+                                    <ModelRuntimePanel />
                                 </div>
                             </div>
 
-                            {/* Agents Runtime */}
-                            <div className="flex items-center justify-center gap-4 text-sm text-slate-400 mt-2">
-                                <span className="font-bold">Agents runtime:</span>
+                            {/* Agent 运行时标识 */}
+                            <div className="flex items-center justify-center gap-4 text-sm text-slate-500 mt-6 pt-4 border-t border-slate-200">
+                                <span className="font-black text-slate-400 uppercase tracking-widest text-xs">Agents Runtime:</span>
                                 <RuntimeBadge label="Cloud Run" />
-                                <span className="text-slate-600">or</span>
+                                <span className="text-slate-300">|</span>
                                 <RuntimeBadge label="Agent Engine" />
-                                <span className="text-slate-600">or</span>
+                                <span className="text-slate-300">|</span>
                                 <RuntimeBadge label="GKE" />
                             </div>
 
-                            <FlowLabel label="MCP clients" step="5" centered />
-                            <ArrowDownSimple />
-
-                            {/* 工具层 */}
-                            <div className="flex gap-6 justify-center">
-                                {/* 内部工具 */}
-                                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5">
-                                    <div className="text-xs text-amber-400 mb-3 font-bold text-center">Tools within Enterprise</div>
-                                    <div className="flex gap-3">
-                                        <ToolNode icon={<Database />} title="企业数据库" />
-                                        <ToolNode icon={<Code2 />} title="内部 APIs" />
-                                        <ToolNode icon={<FileSearch />} title="RAG 引擎" />
-                                    </div>
-                                    <div className="flex justify-center gap-2 mt-2">
-                                        <span className="text-xs text-amber-400/50">MCP servers</span>
-                                    </div>
+                            {/* 工具层与基础设施 */}
+                            <div className="mt-6 pt-6 border-t-2 border-dashed border-slate-200">
+                                <div className="flex justify-center mb-3">
+                                    <FlowLabel label="MCP Protocol" step="5" />
                                 </div>
-
-                                {/* 可观测性 */}
-                                <div className="bg-slate-500/10 border border-slate-500/30 rounded-xl p-4 flex flex-col items-center justify-center">
-                                    <Activity className="w-6 h-6 text-slate-400 mb-2" />
-                                    <div className="text-sm font-bold text-white">可观测性平台</div>
-                                    <div className="text-xs text-slate-500">Observability</div>
-                                </div>
-                            </div>
-
-                            {/* 存储与基础设施 */}
-                            <div className="flex gap-4 justify-center mt-2">
-                                <InfraNode icon={<Database />} title="存储平台" items={['缓存层', '向量库', '对话历史']} />
-                                <InfraNode icon={<Server />} title="计算环境" items={['沙箱隔离', '网络隔离']} />
-                                <InfraNode icon={<Key />} title="密钥管理" items={['HSM 保护', '自动轮换']} />
+                                <ToolsAndInfraPanel />
                             </div>
                         </div>
-                    </div>
 
-                    <ArrowDownSimple />
-                    <FlowLabel label="MCP servers" centered />
-
-                    {/* 外部工具 */}
-                    <div className="bg-slate-500/5 border border-dashed border-slate-500/30 rounded-xl p-5">
-                        <div className="text-xs text-slate-400 mb-3 font-bold text-center">External Tools</div>
-                        <div className="flex gap-4">
-                            <ToolNode icon={<Globe />} title="第三方服务" external />
-                            <ToolNode icon={<FileSearch />} title="外部文件" external />
-                            <div className="text-slate-600 flex items-center">...</div>
+                        {/* 外部工具区域 */}
+                        <ConnectorVertical height={30} />
+                        <div className="flex justify-center mb-3">
+                            <FlowLabel label="External MCP Servers" />
                         </div>
-                    </div>
+                        <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex justify-center gap-6">
+                            <ToolNode icon={<Globe />} title="第三方 API" external />
+                            <ToolNode icon={<FileSearch />} title="外部文档库" external />
+                            <ToolNode icon={<Database />} title="公共数据源" external />
+                        </div>
 
-                    {/* 底部运维角色 */}
-                    <div className="flex gap-8 mt-4">
-                        <UserNode title="平台管理员" subtitle="Platform administrators" icon={<User />} small />
-                        <UserNode title="DevOps 工程师" subtitle="DevOps engineers" icon={<Server />} small />
+                        {/* 底部运维角色 */}
+                        <div className="flex justify-center gap-12 mt-6">
+                            <UserNode title="平台管理员" subtitle="Platform Admin" icon={<User />} small />
+                            <UserNode title="DevOps 工程师" subtitle="DevOps Engineer" icon={<Server />} small />
+                        </div>
+
+                        {/* Xarrows Connections */}
+                        {/* 1. Control Bus: Coordinator <-> Control Plane */}
+                        <Xarrow
+                            start="node-control-plane"
+                            end="node-coordinator"
+                            color="#9333ea"
+                            strokeWidth={2}
+                            startAnchor="right"
+                            endAnchor="left"
+                            path="grid"
+                            showHead={false}
+                            dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
+                            labels={{ middle: <div className="text-[10px] text-purple-500 bg-white px-1 border border-purple-200 rounded">Policy</div> }}
+                        />
+
+                        {/* 2. Inference Pipeline: Subagents -> Runtime Ingress */}
+                        <Xarrow
+                            start="node-subagents"
+                            end="node-runtime-ingress"
+                            color="#2563eb"
+                            strokeWidth={3}
+                            startAnchor="right"
+                            endAnchor="top"
+                            path="smooth"
+                            curveness={0.5}
+                        />
+
+                        {/* 3. Feedback Loop: Runtime Egress -> Generator */}
+                        <Xarrow
+                            start="node-runtime-egress"
+                            end="node-response-generator"
+                            color="#64748b"
+                            strokeWidth={2}
+                            startAnchor="bottom"
+                            endAnchor="right"
+                            path="smooth"
+                            curveness={0.8}
+                            dashness={true}
+                        />
+                    </Xwrapper>
+                </div>
+            </div >
+
+            {/* 底部说明 */}
+            < div className="grid grid-cols-1 lg:grid-cols-2 gap-6" >
+                <TimelineSection />
+                <HighlightsSection />
+            </div >
+        </div >
+    );
+});
+
+// ========== 三栏式面板组件 ==========
+
+// 控制平面面板
+const ControlPlanePanel = memo(() => (
+    <div id="node-control-plane" className="bg-purple-50/50 border border-purple-200 rounded-2xl p-5 h-full relative">
+        <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 bg-purple-100 rounded-xl">
+                <Cpu className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+                <div className="text-sm font-black text-purple-700">控制平面</div>
+                <div className="text-[10px] text-purple-400 uppercase tracking-widest">Control Plane</div>
+            </div>
+        </div>
+        <div className="space-y-3 relative z-10">
+            <ControlPlaneItem icon={<Cpu />} title="意图编排引擎" desc="Intent Orchestrator" />
+            <ControlPlaneItem icon={<Lock />} title="身份管理器" desc="Identity Manager" />
+            <ControlPlaneItem icon={<Brain />} title="记忆管理器" desc="Memory Manager" />
+            <ControlPlaneItem icon={<Activity />} title="配额管理器" desc="Quota Manager" />
+        </div>
+        <div className="mt-4 pt-4 border-t border-purple-100">
+            <div className="text-[10px] text-purple-400 uppercase tracking-widest mb-2">Policy Governance</div>
+            <div className="flex flex-wrap gap-1">
+                <span className="text-[10px] bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full border border-purple-200">审计日志</span>
+                <span className="text-[10px] bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full border border-purple-200">策略执行</span>
+            </div>
+        </div>
+    </div>
+));
+
+// 智能体编排面板
+const AgentOrchestrationPanel = memo(() => (
+    <div className="bg-emerald-50/30 border-2 border-emerald-200 rounded-2xl p-5 relative">
+        <div className="absolute -top-3 left-6 bg-emerald-600 px-4 py-1 rounded-full text-xs font-black text-white shadow-lg shadow-emerald-200">
+            Agent Orchestration Layer
+        </div>
+
+        <div className="flex flex-col items-center gap-4 mt-4">
+            {/* 新增：接入层 (Access Layer) */}
+            <div className="bg-white border-2 border-blue-100 rounded-xl p-3 flex items-center gap-3 shadow-md w-full max-w-md">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                    <Globe className="w-5 h-5 text-blue-500" />
+                </div>
+                <div>
+                    <div className="font-black text-slate-800 text-sm">接入层服务</div>
+                    <div className="text-[10px] text-blue-500 font-bold uppercase tracking-widest">Frontend / Access Layer</div>
+                </div>
+            </div>
+
+            <ConnectorVertical height={16} color="blue" arrow />
+
+            {/* Coordinator Agent */}
+            <div id="node-coordinator" className="bg-white border-2 border-emerald-300 rounded-2xl p-4 flex items-center gap-4 shadow-lg shadow-emerald-100 w-full max-w-md">
+                <div className="w-14 h-14 bg-emerald-100 border border-emerald-200 rounded-xl flex items-center justify-center">
+                    <Cpu className="w-7 h-7 text-emerald-600" />
+                </div>
+                <div>
+                    <div className="font-black text-lg text-slate-900">协调器代理</div>
+                    <div className="text-xs text-emerald-600 font-bold uppercase tracking-widest">Coordinator Agent</div>
+                </div>
+            </div>
+
+            {/* 流程标记 Step 2 & Step 3 */}
+            <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center gap-2">
+                    <FlowLabel label="Human-in-the-loop" step="2" />
+                </div>
+                <ConnectorVertical height={12} color="emerald" />
+
+                <div className="flex items-center gap-2">
+                    <FlowLabel label="Subagent Routing" step="3" />
+                </div>
+                <ConnectorVertical height={12} color="emerald" arrow />
+            </div>
+
+            {/* 子代理编排区域 - 双流程并排 */}
+            <div className="w-full grid grid-cols-2 gap-4">
+                {/* 顺序执行流程 */}
+                <div id="node-subagents" className="bg-white border-2 border-blue-200 rounded-2xl p-4 relative">
+                    <div className="absolute -top-2.5 left-4 bg-blue-500 px-3 py-0.5 rounded-full text-[10px] font-black text-white uppercase tracking-wider">
+                        Sequential Pattern
+                    </div>
+                    <div className="flex flex-col items-center gap-3 mt-3">
+                        <SubagentNode title="职能代理" subtitle="Task-A Agent" color="blue" />
+                        <ConnectorVertical height={16} color="blue" arrow />
+                        <SubagentNode title="技术代理" subtitle="Task-A.1 Agent" color="blue" />
+                    </div>
+                </div>
+
+                {/* 迭代优化流程 */}
+                <div className="bg-white border-2 border-orange-200 rounded-2xl p-4 relative">
+                    <div className="absolute -top-2.5 left-4 bg-orange-500 px-3 py-0.5 rounded-full text-[10px] font-black text-white uppercase tracking-wider">
+                        Iterative Refinement
+                    </div>
+                    <div className="flex flex-col items-center gap-2 mt-3">
+                        <SubagentNode title="任务代理" subtitle="Task-B Agent" color="orange" />
+                        <div className="flex items-center gap-2 w-full">
+                            <div className="flex-1 h-px bg-orange-200"></div>
+                            <span className="text-[10px] text-orange-400 italic">loop</span>
+                            <div className="flex-1 h-px bg-orange-200"></div>
+                        </div>
+                        <div className="flex gap-2 w-full">
+                            <SubagentNode title="质量评估" subtitle="Evaluator" color="orange" small />
+                            <SubagentNode title="提示增强" subtitle="Enhancer" color="purple" small />
+                        </div>
+                        <div className="text-[10px] text-orange-400 italic bg-orange-50 px-2 py-0.5 rounded-full">
+                            ↺ If rework required
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* 底部说明 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <TimelineSection />
-                <HighlightsSection />
+            {/* 响应生成器 */}
+            <div className="flex items-center gap-2 mt-2">
+                <FlowLabel label="Response Aggregation" step="4" />
             </div>
+            <ConnectorVertical height={16} color="emerald" />
+            <div id="node-response-generator" className="bg-emerald-100 border-2 border-emerald-300 rounded-2xl p-4 flex items-center gap-4 shadow-md w-full max-w-md">
+                <div className="w-12 h-12 bg-white border border-emerald-200 rounded-xl flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                    <div className="font-black text-slate-900">响应生成器</div>
+                    <div className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Response Generator + Validation</div>
+                </div>
+            </div>
+        </div>
+    </div>
+));
+
+// 模型运行时面板
+const ModelRuntimePanel = memo(() => (
+    <div className="h-full flex flex-col">
+        <div className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-blue-500"></div>
+
+            <div className="text-xs text-slate-400 font-bold uppercase tracking-widest text-center mb-3">Inference Pipeline</div>
+
+            {/* Ingress Point */}
+            <div id="node-runtime-ingress" className="flex justify-center mb-2">
+                <div className="text-[10px] text-slate-400 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Agent Requests
+                </div>
+            </div>
+
+            {/* 安全护栏 (Middleware) */}
+            <div className="bg-red-50 border-2 border-red-100 rounded-xl p-3 relative mb-2 z-10 shadow-sm">
+                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-red-200 rounded-r"></div>
+                <div className="flex items-center gap-3 mb-2">
+                    <Shield className="w-5 h-5 text-red-500" />
+                    <div>
+                        <div className="text-xs font-black text-red-700 leading-none">安全护栏</div>
+                        <div className="text-[9px] text-red-400 uppercase tracking-widest">Middleware</div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1 relative">
+                    {/* 穿透箭头背景 */}
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-red-200 opacity-20 text-4xl font-black">↓</div>
+                    <span className="text-[9px] bg-white text-red-500 px-1.5 py-0.5 rounded border border-red-100 text-center">Prompt 注入</span>
+                    <span className="text-[9px] bg-white text-red-500 px-1.5 py-0.5 rounded border border-red-100 text-center">PII 脱敏</span>
+                    <span className="text-[9px] bg-white text-red-500 px-1.5 py-0.5 rounded border border-red-100 text-center">幻觉检测</span>
+                    <span className="text-[9px] bg-white text-red-500 px-1.5 py-0.5 rounded border border-red-100 text-center">内容风控</span>
+                </div>
+            </div>
+
+            {/* 管道连接 */}
+            <div className="flex justify-center -my-1 relative z-0">
+                <div className="w-0.5 h-6 bg-slate-200"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-1 text-[9px] text-slate-400 border border-slate-100 rounded-full">Safe</div>
+            </div>
+
+            {/* 模型运行时 */}
+            <div id="node-runtime-egress" className="bg-blue-50/50 border-2 border-blue-100 rounded-xl p-3 flex-1 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                    <Brain className="w-5 h-5 text-blue-500" />
+                    <div>
+                        <div className="text-xs font-black text-slate-700 leading-none">LLM 运行时</div>
+                        <div className="text-[9px] text-blue-400 uppercase tracking-widest">Model Engine</div>
+                    </div>
+                </div>
+                <div className="space-y-1.5">
+                    <RuntimeOption label="Vertex AI" highlight />
+                    <RuntimeOption label="Cloud Run" />
+                </div>
+            </div>
+
+            {/* A2A 协议 */}
+            <div className="mt-auto pt-3 text-center">
+                <div className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 border border-indigo-100 rounded text-[9px] text-indigo-500 font-bold">
+                    <Activity className="w-3 h-3" /> A2A Protocol
+                </div>
+            </div>
+        </div>
+    </div>
+));
+
+// 工具与基础设施面板
+const ToolsAndInfraPanel = memo(() => (
+    <div className="grid grid-cols-2 gap-4">
+        {/* 内部工具 */}
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+            <div className="text-xs text-amber-600 font-black mb-3 uppercase tracking-widest">Enterprise Tools</div>
+            <div className="flex gap-2 flex-wrap">
+                <ToolNode icon={<Database />} title="企业数据库" />
+                <ToolNode icon={<Code2 />} title="内部 APIs" />
+                <ToolNode icon={<FileSearch />} title="RAG 引擎" />
+            </div>
+            <div className="text-[10px] text-amber-400 mt-2 text-center uppercase tracking-widest">MCP Servers</div>
+        </div>
+
+        {/* 基础设施 */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <div className="text-xs text-slate-500 font-black mb-3 uppercase tracking-widest">Infrastructure</div>
+            <div className="grid grid-cols-3 gap-2">
+                <InfraNode icon={<Database />} title="存储" items={['向量库', '缓存']} compact />
+                <InfraNode icon={<Server />} title="计算" items={['沙箱', '隔离']} compact />
+                <InfraNode icon={<Key />} title="密钥" items={['HSM', '轮换']} compact />
+            </div>
+            <div className="flex justify-center mt-2">
+                <Activity className="w-4 h-4 text-slate-300" />
+                <span className="text-[10px] text-slate-400 ml-1">Observability</span>
+            </div>
+        </div>
+    </div>
+));
+
+// ========== 增强连接线组件 ==========
+
+// 垂直连接器
+const ConnectorVertical = memo(({ height = 30, color = 'slate', arrow = false }) => {
+    const colorMap = {
+        slate: 'bg-slate-200',
+        emerald: 'bg-emerald-300',
+        blue: 'bg-blue-300',
+        purple: 'bg-purple-300',
+    };
+    const arrowColorMap = {
+        slate: 'border-t-slate-300',
+        emerald: 'border-t-emerald-400',
+        blue: 'border-t-blue-400',
+        purple: 'border-t-purple-400',
+    };
+    return (
+        <div className="flex flex-col items-center">
+            <div className={`w-0.5 ${colorMap[color]}`} style={{ height: `${height}px` }}></div>
+            {arrow && (
+                <div className={`w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] ${arrowColorMap[color]}`}></div>
+            )}
         </div>
     );
 });
 
-// 用户节点组件
+
+
+// 用户节点
 const UserNode = memo(({ title, subtitle, icon, small }) => (
-    <div className={`flex flex-col items-center ${small ? 'scale-90 opacity-70' : ''}`}>
-        <div className="w-12 h-12 bg-slate-700/50 border border-slate-600 rounded-xl flex items-center justify-center mb-2">
-            {React.cloneElement(icon, { className: 'w-6 h-6 text-slate-300' })}
+    <div className={`flex flex-col items-center ${small ? 'gap-2' : 'gap-3'}`}>
+        <div className={`bg-white border-2 border-slate-200 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-100 transition-transform hover:-translate-y-1 ${small ? 'w-14 h-14' : 'w-20 h-20'}`}>
+            <div className="text-slate-600">{React.cloneElement(icon, { size: small ? 24 : 32 })}</div>
         </div>
-        <div className="text-sm font-bold text-white">{title}</div>
-        <div className="text-xs text-slate-500">{subtitle}</div>
+        <div className="text-center leading-tight">
+            <div className={`font-black text-slate-900 ${small ? 'text-sm' : 'text-base'}`}>{title}</div>
+            <div className={`text-slate-400 font-bold uppercase tracking-tighter ${small ? 'text-[10px]' : 'text-xs'}`}>{subtitle}</div>
+        </div>
     </div>
 ));
 
-// 流程标签组件
+// 步进标注
 const FlowLabel = memo(({ label, step, centered }) => (
-    <div className={`flex items-center gap-2 ${centered ? 'justify-center w-full' : ''}`}>
-        {step && (
-            <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-xs font-black text-white">
-                {step}
-            </div>
-        )}
-        <span className="text-xs text-slate-400 font-medium">{label}</span>
+    <div className={`flex items-center gap-2 ${centered ? 'justify-center' : ''}`}>
+        {step && <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white text-xs font-black rounded-full shadow-lg shadow-blue-200">{step}</span>}
+        <span className="text-sm font-black text-blue-600/80 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 uppercase tracking-wider">{label}</span>
     </div>
 ));
 
-// 逻辑节点组件
+// 逻辑架构节点
 const LogicNode = memo(({ title, subtitle, icon, color, items }) => {
-    const colors = {
-        blue: 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-        purple: 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-        emerald: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
+    const colorMap = {
+        blue: 'bg-blue-50 border-blue-200 text-blue-700',
+        purple: 'bg-purple-50 border-purple-200 text-purple-700',
+        emerald: 'bg-emerald-50 border-emerald-200 text-emerald-700',
     };
     return (
-        <div className={`${colors[color]} border rounded-xl p-4`}>
-            <div className="flex items-center gap-2 mb-2">
-                {React.cloneElement(icon, { className: 'w-5 h-5' })}
-                <span className="font-bold text-white text-sm">{title}</span>
+        <div className={`group/node relative border-2 ${colorMap[color]} p-6 rounded-3xl min-w-[280px] shadow-sm hover:shadow-xl transition-all duration-300 bg-white`}>
+            <div className="flex items-center gap-4 mb-4">
+                <div className={`p-3 rounded-2xl bg-${color}-50 border border-${color}-100`}>
+                    {React.cloneElement(icon, { size: 24, className: `text-${color}-600` })}
+                </div>
+                <div>
+                    <div className="font-black text-slate-900 leading-none mb-1">{title}</div>
+                    <div className="text-xs text-slate-400 font-bold tracking-widest">{subtitle}</div>
+                </div>
             </div>
-            <div className="text-xs opacity-70 mb-2">{subtitle}</div>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-2">
                 {items.map(item => (
-                    <span key={item} className="text-xs bg-white/5 px-2 py-0.5 rounded text-slate-300">{item}</span>
+                    <span key={item} className={`text-xs font-black px-3 py-1.5 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 transition-colors group-hover/node:bg-${color}-50 group-hover/node:border-${color}-200`}>{item}</span>
                 ))}
             </div>
         </div>
@@ -710,13 +891,13 @@ const LogicNode = memo(({ title, subtitle, icon, color, items }) => {
 
 // Coordinator 节点
 const CoordinatorNode = memo(() => (
-    <div className="bg-emerald-500/20 border-2 border-emerald-500/50 rounded-xl p-4 flex items-center gap-3">
-        <div className="w-10 h-10 bg-emerald-600/30 rounded-lg flex items-center justify-center">
-            <Cpu className="w-6 h-6 text-emerald-400" />
+    <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6 flex items-center gap-5 shadow-lg shadow-emerald-50 transition-transform hover:-translate-y-1">
+        <div className="w-16 h-16 bg-white border border-emerald-200 rounded-2xl flex items-center justify-center shadow-sm">
+            <Cpu className="w-8 h-8 text-emerald-600" />
         </div>
         <div>
-            <div className="font-bold text-white">编排智能体</div>
-            <div className="text-xs text-emerald-400/70">Coordinator Agent</div>
+            <div className="font-black text-xl text-slate-900">编排智能体</div>
+            <div className="text-xs text-emerald-600 font-black uppercase tracking-[0.2em] mt-1">Coordinator Agent</div>
         </div>
     </div>
 ));
@@ -724,19 +905,19 @@ const CoordinatorNode = memo(() => (
 // 子代理节点
 const SubagentNode = memo(({ title, subtitle, color, small, highlight }) => {
     const colors = {
-        emerald: 'border-emerald-500/40 bg-emerald-500/10',
-        orange: 'border-orange-500/40 bg-orange-500/10',
-        purple: 'border-purple-500/40 bg-purple-500/10',
+        emerald: 'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-emerald-50',
+        orange: 'border-orange-200 bg-orange-50 text-orange-900 shadow-orange-50',
+        purple: 'border-purple-200 bg-purple-50 text-purple-900 shadow-purple-50',
     };
     return (
-        <div className={`${colors[color]} border rounded-lg p-3 ${small ? 'text-xs' : ''} ${highlight ? 'border-2' : ''}`}>
-            <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-white/5 rounded flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-slate-400" />
+        <div className={`border-2 ${colors[color]} rounded-2xl p-4 transition-all hover:shadow-lg ${small ? 'text-xs' : ''} ${highlight ? 'ring-2 ring-blue-400 ring-offset-2' : ''} bg-white`}>
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-slate-600" />
                 </div>
                 <div>
-                    <div className="font-bold text-white text-sm">{title}</div>
-                    <div className="text-xs text-slate-500">{subtitle}</div>
+                    <div className="font-black text-slate-900 text-sm leading-none mb-1">{title}</div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{subtitle}</div>
                 </div>
             </div>
         </div>
@@ -744,62 +925,90 @@ const SubagentNode = memo(({ title, subtitle, color, small, highlight }) => {
 });
 
 // 运行时选项
-const RuntimeOption = memo(({ label }) => (
-    <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Server className="w-3 h-3" />
+const RuntimeOption = memo(({ label, highlight }) => (
+    <div className={`flex items-center gap-3 text-sm font-bold transition-colors cursor-default ${highlight ? 'text-blue-600' : 'text-slate-500 hover:text-blue-600'}`}>
+        <div className={`w-5 h-5 rounded flex items-center justify-center shadow-sm ${highlight ? 'bg-blue-100 border border-blue-200' : 'bg-slate-100'}`}>
+            <Server className="w-3 h-3" />
+        </div>
         <span>{label}</span>
+        {highlight && <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">推荐</span>}
     </div>
 ));
+
 
 // 运行时徽章
 const RuntimeBadge = memo(({ label }) => (
-    <span className="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">{label}</span>
+    <span className="px-3 py-1.5 bg-slate-100 rounded-xl text-xs text-slate-600 border border-slate-200 font-black shadow-sm">{label}</span>
 ));
 
 // 控制平面项
-const ControlPlaneItem = memo(({ icon, title }) => (
-    <div className="flex items-center gap-2">
-        {React.cloneElement(icon, { className: 'w-4 h-4 text-purple-400' })}
-        <span className="text-xs text-slate-300">{title}</span>
+const ControlPlaneItem = memo(({ icon, title, desc }) => (
+    <div className="flex items-center gap-3 group/cp cursor-default">
+        <div className="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center border border-purple-200 shadow-sm group-hover/cp:bg-purple-600 transition-colors">
+            {React.cloneElement(icon, { className: 'w-4 h-4 text-purple-600 group-hover/cp:text-white transition-colors' })}
+        </div>
+        <div>
+            <div className="text-sm text-slate-700 font-black transition-colors group-hover/cp:text-slate-900">{title}</div>
+            {desc && <div className="text-[10px] text-slate-400">{desc}</div>}
+        </div>
     </div>
 ));
 
+
 // 工具节点
 const ToolNode = memo(({ icon, title, external }) => (
-    <div className={`flex flex-col items-center p-3 rounded-lg ${external ? 'bg-slate-500/10' : 'bg-amber-500/5'}`}>
-        {React.cloneElement(icon, { className: `w-6 h-6 ${external ? 'text-slate-400' : 'text-amber-400'}` })}
-        <span className="text-xs text-white mt-1 font-medium">{title}</span>
+    <div className={`flex flex-col items-center justify-center p-4 rounded-2xl transition-all cursor-default ${external ? 'bg-slate-50 border border-slate-200 shadow-sm hover:translate-y-1' : 'bg-amber-50 border border-amber-200 shadow-md hover:-translate-y-1'}`}>
+        {React.cloneElement(icon, { className: `w-8 h-8 ${external ? 'text-slate-400' : 'text-amber-600'}` })}
+        <span className={`text-xs mt-2 font-black uppercase tracking-tighter ${external ? 'text-slate-400' : 'text-amber-700'}`}>{title}</span>
     </div>
 ));
 
 // 基础设施节点
-const InfraNode = memo(({ icon, title, items }) => (
-    <div className="bg-slate-500/10 border border-slate-500/20 rounded-lg p-3">
-        <div className="flex items-center gap-2 mb-2">
-            {React.cloneElement(icon, { className: 'w-4 h-4 text-slate-400' })}
-            <span className="text-xs font-bold text-white">{title}</span>
+const InfraNode = memo(({ icon, title, items, compact }) => {
+    if (compact) {
+        return (
+            <div className="bg-white border border-slate-100 rounded-xl p-3 text-center hover:shadow-md transition-all">
+                {React.cloneElement(icon, { className: 'w-5 h-5 text-slate-500 mx-auto mb-1' })}
+                <div className="text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1">{title}</div>
+                <div className="flex flex-wrap gap-0.5 justify-center">
+                    {items.map(item => (
+                        <span key={item} className="text-[8px] text-slate-400">{item}</span>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+    return (
+        <div className="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                    {React.cloneElement(icon, { className: 'w-5 h-5 text-slate-600' })}
+                </div>
+                <span className="text-sm font-black text-slate-900 uppercase tracking-widest">{title}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                {items.map(item => (
+                    <span key={item} className="text-[10px] font-black bg-slate-50 px-2 py-1 rounded-lg text-slate-500 border border-slate-100">{item}</span>
+                ))}
+            </div>
         </div>
-        <div className="flex flex-wrap gap-1">
-            {items.map(item => (
-                <span key={item} className="text-xs bg-white/5 px-1.5 py-0.5 rounded text-slate-400">{item}</span>
-            ))}
-        </div>
-    </div>
-));
+    );
+});
+
 
 // 简单箭头
 const ArrowDownSimple = memo(() => (
     <div className="flex flex-col items-center">
-        <div className="w-0.5 h-4 bg-gradient-to-b from-blue-500/40 to-purple-500/40"></div>
-        <div className="w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-6 border-t-purple-500/40"></div>
+        <div className="w-0.5 h-6 bg-slate-100"></div>
+        <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-slate-200"></div>
     </div>
 ));
 
 // 微型箭头
 const ArrowDownTiny = memo(() => (
-    <div className="flex flex-col items-center">
-        <div className="w-0.5 h-2 bg-emerald-500/30"></div>
-        <div className="w-0 h-0 border-l-2 border-l-transparent border-r-2 border-r-transparent border-t-3 border-t-emerald-500/30"></div>
+    <div className="flex flex-col items-center group/arrow">
+        <div className="w-0.5 h-3 bg-emerald-200 group-hover/arrow:bg-emerald-400 transition-colors"></div>
+        <div className="w-0 h-0 border-l-3 border-l-transparent border-r-3 border-r-transparent border-t-4 border-t-emerald-200 group-hover/arrow:border-t-emerald-400 transition-colors"></div>
     </div>
 ));
 
@@ -814,17 +1023,20 @@ const TimelineSection = memo(() => {
     ], []);
 
     return (
-        <div className="bg-gradient-to-br from-blue-900/20 to-transparent border border-white/10 p-10 rounded-[3rem]">
-            <h4 className="text-2xl font-black text-white mb-8 flex items-center gap-3">
-                <RotateCw className="text-blue-400 w-6 h-6" /> 请求处理全链路时序
+        <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 p-10 rounded-[3rem] shadow-xl shadow-blue-50">
+            <h4 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                <div className="p-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200">
+                    <RotateCw className="w-6 h-6" />
+                </div>
+                请求处理全链路时序
             </h4>
             <div className="space-y-8">
                 {timelineItems.map((item) => (
-                    <div key={item.step} className="flex gap-6">
-                        <div className="text-3xl font-black text-blue-500/30 tracking-tighter">{item.step}</div>
+                    <div key={item.step} className="flex gap-6 group/item">
+                        <div className="text-3xl font-black text-blue-600/20 tracking-tighter group-hover/item:text-blue-600/40 transition-colors pt-1">{item.step}</div>
                         <div>
-                            <div className="text-xl font-bold text-white mb-1">{item.title}</div>
-                            <p className="text-slate-400 font-medium">{item.desc}</p>
+                            <div className="text-xl font-black text-slate-800 mb-1">{item.title}</div>
+                            <p className="text-slate-500 font-bold leading-relaxed">{item.desc}</p>
                         </div>
                     </div>
                 ))}
@@ -842,18 +1054,21 @@ const HighlightsSection = memo(() => {
     ], []);
 
     return (
-        <div className="bg-gradient-to-br from-purple-900/20 to-transparent border border-white/10 p-10 rounded-[3rem]">
-            <h4 className="text-2xl font-black text-white mb-8 flex items-center gap-3">
-                <Zap className="text-purple-400 w-6 h-6" /> 关键架构设计亮点
+        <div className="bg-gradient-to-br from-purple-50 to-white border border-purple-100 p-10 rounded-[3rem] shadow-xl shadow-purple-50">
+            <h4 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                <div className="p-2 bg-purple-600 text-white rounded-xl shadow-lg shadow-purple-200">
+                    <Zap className="w-6 h-6" />
+                </div>
+                关键架构设计亮点
             </h4>
             <div className="grid grid-cols-1 gap-6">
                 {highlightItems.map((item) => (
-                    <div key={item.title} className="bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="text-purple-400">{item.icon}</div>
-                            <div className="text-lg font-black text-white leading-none">{item.title}</div>
+                    <div key={item.title} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="text-purple-600">{item.icon}</div>
+                            <div className="text-lg font-black text-slate-900 leading-none">{item.title}</div>
                         </div>
-                        <p className="text-sm text-slate-400 font-medium">{item.desc}</p>
+                        <p className="text-sm text-slate-500 font-bold leading-relaxed">{item.desc}</p>
                     </div>
                 ))}
             </div>
@@ -903,37 +1118,40 @@ export default ArchitectureViz;
 const DevelopmentView = memo(() => (
     <div className="space-y-8">
         <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-indigo-500/20 rounded-2xl border border-indigo-500/30">
-                <Code2 className="text-indigo-400 w-8 h-8" />
+            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100 shadow-sm shadow-indigo-100">
+                <Code2 className="w-8 h-8" />
             </div>
             <div>
-                <h3 className="text-3xl font-black text-white">开发架构视图 (Development View)</h3>
-                <p className="text-slate-400 text-sm mt-1">代码组织、模块依赖与构建流水线</p>
+                <h3 className="text-3xl font-black text-slate-900">开发架构视图 (Development View)</h3>
+                <p className="text-slate-500 text-sm mt-1">代码组织、模块依赖与构建流水线</p>
             </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white/[0.03] border border-white/10 rounded-[2rem] p-8">
-                <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-indigo-400" /> 技术栈矩阵
+            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50">
+                <h4 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                    <Layers className="w-6 h-6 text-indigo-500" /> 技术栈矩阵
                 </h4>
-                <div className="space-y-4">
+                <div className="space-y-6">
                     <DevStackItem label="Frontend" items={['React 18', 'Vite', 'Tailwind CSS', 'Lucide React']} />
                     <DevStackItem label="Backend" items={['Python 3.11', 'FastAPI', 'LangChain', 'Pydantic']} />
                     <DevStackItem label="Data" items={['PostgreSQL', 'Redis', 'Qdrant', 'MinIO']} />
                     <DevStackItem label="Infra" items={['Docker', 'Kubernetes', 'Terraform', 'GitHub Actions']} />
                 </div>
             </div>
-            <div className="bg-white/[0.03] border border-white/10 rounded-[2rem] p-8">
-                <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Code2 className="w-5 h-5 text-indigo-400" /> 模块结构
+            <div className="bg-slate-900 rounded-[2.5rem] p-10 shadow-xl shadow-slate-400/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                <h4 className="text-2xl font-black text-white mb-8 flex items-center gap-3 relative z-10">
+                    <Code2 className="w-6 h-6 text-indigo-400" /> 模块结构
                 </h4>
-                <div className="font-mono text-sm text-slate-400 bg-black/20 p-6 rounded-xl border border-white/5">
-                    <div className="mb-2 text-indigo-400">src/</div>
-                    <div className="pl-4">├── <span className="text-slate-200">api/</span> <span className="text-slate-500">// REST & GraphQL endpoints</span></div>
-                    <div className="pl-4">├── <span className="text-slate-200">agents/</span> <span className="text-slate-500">// Intelligent agent logic</span></div>
-                    <div className="pl-4">├── <span className="text-slate-200">core/</span> <span className="text-slate-500">// Shared utilities & config</span></div>
-                    <div className="pl-4">├── <span className="text-slate-200">db/</span> <span className="text-slate-500">// Database models & migrations</span></div>
-                    <div className="pl-4">└── <span className="text-slate-200">web/</span> <span className="text-slate-500">// Frontend application</span></div>
+                <div className="font-mono text-sm text-slate-300 bg-black/40 p-8 rounded-2xl border border-white/10 relative z-10 leading-relaxed">
+                    <div className="mb-2 text-indigo-400 font-black">src/</div>
+                    <div className="pl-6 border-l border-white/10 ml-1">
+                        <div className="mb-1">├── <span className="text-white">api/</span> <span className="text-slate-500 ml-2">// REST & GraphQL endpoints</span></div>
+                        <div className="mb-1">├── <span className="text-white">agents/</span> <span className="text-slate-500 ml-2">// Intelligent agent logic</span></div>
+                        <div className="mb-1">├── <span className="text-white">core/</span> <span className="text-slate-500 ml-2">// Shared utilities & config</span></div>
+                        <div className="mb-1">├── <span className="text-white">db/</span> <span className="text-slate-500 ml-2">// Database models & migrations</span></div>
+                        <div className="mb-1">└── <span className="text-white">web/</span> <span className="text-slate-500 ml-2">// Frontend application</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -941,10 +1159,10 @@ const DevelopmentView = memo(() => (
 ));
 
 const DevStackItem = ({ label, items }) => (
-    <div className="flex flex-col gap-2">
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
+    <div className="flex flex-col gap-3">
+        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{label}</span>
         <div className="flex flex-wrap gap-2">
-            {items.map(i => <span key={i} className="text-xs font-medium text-indigo-200 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">{i}</span>)}
+            {items.map(i => <span key={i} className="text-xs font-black text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100 hover:bg-indigo-600 hover:text-white transition-colors cursor-default">{i}</span>)}
         </div>
     </div>
 );
@@ -952,28 +1170,28 @@ const DevStackItem = ({ label, items }) => (
 const DataView = memo(() => (
     <div className="space-y-8">
         <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-cyan-500/20 rounded-2xl border border-cyan-500/30">
-                <Database className="text-cyan-400 w-8 h-8" />
+            <div className="p-3 bg-cyan-50 text-cyan-600 rounded-2xl border border-cyan-100 shadow-sm shadow-cyan-100">
+                <Database className="w-8 h-8" />
             </div>
             <div>
-                <h3 className="text-3xl font-black text-white">数据架构视图 (Data View)</h3>
-                <p className="text-slate-400 text-sm mt-1">核心实体关系与数据流转管道</p>
+                <h3 className="text-3xl font-black text-slate-900">数据架构视图 (Data View)</h3>
+                <p className="text-slate-500 text-sm mt-1">核心实体关系与数据流转管道</p>
             </div>
         </div>
-        <div className="bg-[#0a0f1e] text-slate-300 p-8 rounded-[2rem] border border-white/10 overflow-x-auto">
+        <div className="bg-white p-12 rounded-[3.5rem] border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-x-auto">
             <div className="min-w-[800px] flex justify-center gap-16">
                 <EntityNode name="User" fields={['UUID', 'Role', 'SVID']} />
-                <div className="flex items-center text-slate-600">── 1:N ──</div>
+                <div className="flex items-center text-slate-300 font-black text-sm italic">── 1:N ──</div>
                 <EntityNode name="Session" fields={['SessionID', 'Context', 'History']} />
-                <div className="flex items-center text-slate-600">── 1:N ──</div>
+                <div className="flex items-center text-slate-300 font-black text-sm italic">── 1:N ──</div>
                 <EntityNode name="Memory" fields={['VectorID', 'Embedding', 'Metadata']} />
             </div>
-            <div className="flex justify-center my-8">
-                <div className="h-16 border-l border-dashed border-slate-600"></div>
+            <div className="flex justify-center my-10">
+                <div className="h-20 border-l-2 border-dashed border-slate-200"></div>
             </div>
             <div className="min-w-[800px] flex justify-center gap-16">
                 <EntityNode name="Agent" fields={['AgentID', 'Tools', 'Prompt']} color="purple" />
-                <div className="flex items-center text-slate-600">── Uses ──</div>
+                <div className="flex items-center text-slate-300 font-black text-sm italic">── USES ──</div>
                 <EntityNode name="Tool" fields={['ToolID', 'Schema', 'ACL']} color="amber" />
             </div>
         </div>
@@ -981,10 +1199,13 @@ const DataView = memo(() => (
 ));
 
 const EntityNode = ({ name, fields, color = 'cyan' }) => (
-    <div className={`bg-${color}-500/5 border border-${color}-500/30 p-4 rounded-xl min-w-[180px]`}>
-        <div className={`text-${color}-400 font-bold mb-3 border-b border-${color}-500/20 pb-2 text-center`}>{name}</div>
-        <div className="space-y-1">
-            {fields.map(f => <div key={f} className="text-xs text-slate-400 font-mono">+ {f}</div>)}
+    <div className={`bg-${color}-50 border border-${color}-200 p-6 rounded-[2rem] min-w-[200px] shadow-sm hover:shadow-xl transition-all`}>
+        <div className={`text-${color}-600 font-black mb-4 border-b border-${color}-100 pb-3 text-center text-lg tracking-widest uppercase`}>{name}</div>
+        <div className="space-y-2">
+            {fields.map(f => <div key={f} className="text-sm text-slate-600 font-bold flex items-center gap-2">
+                <div className={`w-1.5 h-1.5 rounded-full bg-${color}-400`}></div>
+                {f}
+            </div>)}
         </div>
     </div>
 );
@@ -992,46 +1213,51 @@ const EntityNode = ({ name, fields, color = 'cyan' }) => (
 const PhysicalView = memo(() => (
     <div className="space-y-8">
         <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
-                <Server className="text-emerald-400 w-8 h-8" />
+            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100 shadow-sm shadow-emerald-100">
+                <Server className="w-8 h-8" />
             </div>
             <div>
-                <h3 className="text-3xl font-black text-white">物理架构视图 (Physical View)</h3>
-                <p className="text-slate-400 text-sm mt-1">云原生部署拓扑与网络边界</p>
+                <h3 className="text-3xl font-black text-slate-900">物理架构视图 (Physical View)</h3>
+                <p className="text-slate-500 text-sm mt-1">云原生部署拓扑与网络边界</p>
             </div>
         </div>
-        <div className="bg-slate-900 border border-white/10 rounded-[2rem] p-8 relative overflow-hidden">
-            <div className="absolute top-4 left-4 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded text-xs font-bold border border-emerald-500/30">AWS / Google Cloud Region</div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-                <ZoneBox name="Public Subnet (DMZ)">
+        <div className="bg-slate-50 border border-slate-200 rounded-[3.5rem] p-12 relative overflow-hidden shadow-xl">
+            <div className="absolute top-6 left-10 bg-emerald-600 text-white px-5 py-2 rounded-full text-xs font-black border border-emerald-400 shadow-lg shadow-emerald-200 tracking-widest uppercase">
+                Global Region Context
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
+                <ZoneBox name="Public Subnet (DMZ)" color="slate">
                     <InfraComponent name="Load Balancer (WAF)" icon={<Globe />} />
                     <InfraComponent name="API Gateway" icon={<Link />} />
                 </ZoneBox>
-                <ZoneBox name="Private App Subnet">
-                    <InfraComponent name="Kubernetes Cluster (GKE/EKS)" icon={<Server />} count={3} />
+                <ZoneBox name="Private App Subnet" color="blue">
+                    <InfraComponent name="K8s Cluster (EKS/GKE)" icon={<Server />} count={3} />
                     <InfraComponent name="Agent Replicas" icon={<Bot />} count={12} />
                 </ZoneBox>
-                <ZoneBox name="Private Data Subnet">
+                <ZoneBox name="Private Data Subnet" color="emerald">
                     <InfraComponent name="Vector DB Cluster" icon={<Database />} />
                     <InfraComponent name="PostgreSQL Primary" icon={<Database />} />
-                    <InfraComponent name="Redis Cache" icon={<Zap />} />
+                    <InfraComponent name="Redis High Availability" icon={<Zap />} />
                 </ZoneBox>
             </div>
         </div>
     </div>
 ));
 
-const ZoneBox = ({ name, children }) => (
-    <div className="border border-dashed border-slate-600/50 rounded-xl p-6 bg-black/20">
-        <div className="text-xs font-bold text-slate-500 uppercase mb-4">{name}</div>
+const ZoneBox = ({ name, children, color = 'slate' }) => (
+    <div className="border border-slate-200 rounded-[2.5rem] p-8 bg-white shadow-sm hover:shadow-xl transition-all duration-300">
+        <div className="text-[10px] font-black text-slate-400 uppercase mb-6 tracking-[0.2em] flex items-center gap-2">
+            <span className="w-4 h-0.5 bg-slate-200"></span>
+            {name}
+        </div>
         <div className="space-y-4">{children}</div>
     </div>
 );
 
 const InfraComponent = ({ name, icon, count }) => (
-    <div className="flex items-center gap-3 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
-        <div className="text-slate-400">{icon}</div>
-        <div className="text-sm font-medium text-slate-200">{name}</div>
-        {count && <div className="ml-auto text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">{count} nodes</div>}
+    <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-blue-300 transition-colors">
+        <div className="text-slate-400 group-hover:text-blue-600 transition-colors">{icon}</div>
+        <div className="text-sm font-black text-slate-700 leading-none">{name}</div>
+        {count && <div className="ml-auto text-[10px] font-black bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{count} NODES</div>}
     </div>
 );
