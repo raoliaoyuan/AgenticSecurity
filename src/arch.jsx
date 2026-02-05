@@ -579,7 +579,7 @@ const ProcessView = memo(() => {
                                     </div>
 
                                     {/* Step 3 */}
-                                    <div className="flex items-center gap-2 mb-2">
+                                    <div className="flex items-center gap-2 mb-3 mt-4">
                                         <span className="flex items-center justify-center w-5 h-5 bg-emerald-600 text-white text-xs font-black rounded-full">3</span>
                                         <span className="text-xs font-bold text-slate-500">子代理调用 Subagent</span>
                                     </div>
@@ -606,8 +606,9 @@ const ProcessView = memo(() => {
                                     </div>
 
                                     {/* Step 4 + Response Generator */}
-                                    <div className="flex items-center gap-2 mb-2">
+                                    <div className="flex items-center gap-2 mb-2 mt-2">
                                         <span className="flex items-center justify-center w-5 h-5 bg-emerald-600 text-white text-xs font-black rounded-full">4</span>
+                                        <span className="text-xs font-bold text-slate-500">结果整合 Result Aggregation</span>
                                     </div>
                                     <div id="node-response-gen" className="bg-emerald-100 border border-emerald-300 rounded-lg p-2.5 flex items-center gap-2">
                                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
@@ -726,6 +727,33 @@ const ProcessView = memo(() => {
 
                     {/* ========== 连接线 - 全部使用 grid 路径 ========== */}
 
+                    {/* User -> Frontend */}
+                    <Xarrow
+                        start="user-app"
+                        end="node-frontend"
+                        color="#10b981"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor="bottom"
+                        endAnchor="top"
+                        showHead={true}
+                        headSize={5}
+                        labels={{ middle: <div className="text-[10px] text-emerald-600 bg-white px-2 py-0.5 rounded border border-emerald-100 shadow-sm font-bold">提示词 Prompt</div> }}
+                    />
+
+                    <Xarrow
+                        start="user-dev"
+                        end="node-frontend"
+                        color="#64748b"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor="bottom"
+                        endAnchor="top"
+                        showHead={true}
+                        headSize={5}
+                        labels={{ middle: <div className="text-[10px] text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-100 shadow-sm font-bold">配置/指令 Config</div> }}
+                    />
+
                     {/* 控制平面 -> Coordinator (策略) */}
                     <Xarrow
                         start="node-control-plane"
@@ -739,7 +767,7 @@ const ProcessView = memo(() => {
                         headSize={5}
                         dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
                         gridBreak="50%"
-                        labels={{ middle: <div className="text-xs text-purple-500 bg-white px-2 py-0.5 rounded border border-purple-200">策略 Policy</div> }}
+                        labels={{ middle: <div className="text-xs text-purple-500 bg-white px-2 py-0.5 rounded border border-purple-200 shadow-sm font-bold">策略 Policy</div> }}
                     />
 
                     {/* Frontend -> Orchestration Layer */}
@@ -754,6 +782,7 @@ const ProcessView = memo(() => {
                         showHead={true}
                         headSize={5}
                         gridBreak="50%"
+                        labels={{ middle: <div className="text-xs text-emerald-600 bg-white px-2 py-0.5 rounded border border-emerald-100 shadow-sm font-bold">请求 Request</div> }}
                     />
 
                     {/* Coordinator -> Model Armor (推理请求) */}
@@ -768,7 +797,7 @@ const ProcessView = memo(() => {
                         showHead={true}
                         headSize={5}
                         gridBreak="50%"
-                        labels={{ middle: <div className="text-xs text-slate-500 bg-white px-2 py-0.5 rounded">推理请求</div> }}
+                        labels={{ middle: <div className="text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded shadow-sm">推理请求 Inference</div> }}
                     />
 
                     {/* Model Armor -> AI Model */}
@@ -783,6 +812,7 @@ const ProcessView = memo(() => {
                         showHead={true}
                         headSize={5}
                         gridBreak="50%"
+                        labels={{ middle: <div className="text-[9px] text-slate-500 bg-white px-1 rounded">安全审查 Security</div> }}
                     />
 
                     {/* AI Model -> Response Generator (推理响应) */}
@@ -798,7 +828,7 @@ const ProcessView = memo(() => {
                         headSize={5}
                         dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
                         gridBreak="70%"
-                        labels={{ middle: <div className="text-xs text-emerald-500 bg-white px-2 py-0.5 rounded">推理响应</div> }}
+                        labels={{ middle: <div className="text-[10px] text-emerald-500 bg-white px-2 py-0.5 rounded border border-emerald-100 shadow-sm">文本返回 Text Result</div> }}
                     />
 
                     {/* Orchestration -> Internal Tools (MCP) */}
@@ -808,12 +838,28 @@ const ProcessView = memo(() => {
                         color="#3b82f6"
                         strokeWidth={2}
                         path="grid"
-                        startAnchor={{ position: "bottom", offset: { x: -30 } }}
+                        startAnchor={{ position: "bottom", offset: { x: -60 } }}
                         endAnchor="top"
                         showHead={true}
                         headSize={5}
                         gridBreak="50%"
-                        labels={{ middle: <div className="text-xs text-blue-500 bg-white px-2 py-0.5 rounded border border-blue-200">MCP</div> }}
+                        labels={{ middle: <div className="text-xs text-blue-500 bg-white px-2 py-0.5 rounded border border-blue-200 shadow-sm font-bold">内部调用 MCP</div> }}
+                    />
+
+                    {/* Orchestration -> External Tools (MCP) */}
+                    <Xarrow
+                        start="orchestration-layer"
+                        end="tools-external"
+                        color="#94a3b8"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor={{ position: "bottom", offset: { x: 60 } }}
+                        endAnchor="top"
+                        showHead={true}
+                        headSize={5}
+                        dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
+                        gridBreak="50%"
+                        labels={{ middle: <div className="text-xs text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-sm font-bold">外部扩展 External Call</div> }}
                     />
 
                 </Xwrapper>
