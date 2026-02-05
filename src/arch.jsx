@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
 import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
+// 导入架构 Schema 配置 - LLM 可直接阅读此文件理解架构逻辑
+import PROCESS_VIEW_SCHEMA, { schemaToMermaid, getSchemaSummary } from './processViewSchema';
 import {
     Shield,
     User,
@@ -440,152 +442,409 @@ const ArchitectureViz = () => {
 
 
 const ProcessView = memo(() => {
+    // =========================================================================
+    // 数据驱动：基于 Google Multi-Agent 架构重新设计
+    // 优化: 1) 所有连接线使用水平/垂直线 2) 中英双语 3) 一页内展示
+    // =========================================================================
+    const schema = PROCESS_VIEW_SCHEMA;
+
+    // 开发模式下输出 Schema 摘要
+    useMemo(() => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('📐 ProcessView Schema Summary:', getSchemaSummary(schema));
+        }
+    }, [schema]);
+
     return (
-        <div className="space-y-8">
+        <div className="max-w-5xl mx-auto space-y-6">
             {/* 标题 */}
-            <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl border border-purple-100 shadow-sm shadow-purple-100">
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl border border-purple-100">
                     <Layers className="w-8 h-8" />
                 </div>
                 <div>
-                    <h3 className="text-3xl font-black text-slate-900">运行架构视图 (Process View)</h3>
-                    <p className="text-slate-500 text-sm mt-1">动态行为、Prompt 流转与 Agent 编排流程 (参考 Google Multi-Agent 架构)</p>
+                    <h3 className="text-3xl font-black text-slate-900">{schema.metadata.title}</h3>
+                    <p className="text-slate-500 text-sm">{schema.metadata.subtitle}</p>
                 </div>
             </div>
 
-            {/* 主架构图 - 三栏式布局 */}
-            <div className="relative bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-xl shadow-slate-200/50 overflow-x-auto">
-                <div className="min-w-[1100px] relative">
-                    <Xwrapper>
-
-                        {/* SVG 连接层 - 位于最底层 */}
-
-
-
-                        {/* 用户入口区域 */}
-                        <div className="flex justify-center gap-20 mb-6 relative z-10">
-                            <UserNode title="应用用户" subtitle="Application Users" icon={<User />} />
-                            <UserNode title="AI 开发者" subtitle="AI Developers" icon={<Code2 />} />
-                        </div>
-
-                        {/* 流程入口标注 */}
-                        <div className="flex flex-col items-center mb-6 relative z-10">
-                            <FlowLabel label="Step 1: Prompt Request" />
-                            <ArrowDownTiny />
-                        </div>
-
-                        {/* 企业环境大框 */}
-                        <div className="bg-gradient-to-b from-blue-50/80 to-slate-50/50 border-2 border-blue-200 rounded-[2rem] p-6 relative z-10">
-                            <div className="absolute -top-4 left-8 bg-blue-600 px-5 py-2 rounded-full text-sm font-black text-white tracking-widest shadow-lg shadow-blue-200 flex items-center gap-2">
-                                <Shield className="w-4 h-4" /> ENTERPRISE ENVIRONMENT
+            {/* 主架构图 */}
+            <div className="relative bg-white rounded-3xl border border-slate-200 p-6 shadow-xl">
+                <Xwrapper>
+                    {/* ========== 顶部：用户入口 ========== */}
+                    <div className="flex justify-center gap-20 mb-4">
+                        <div id="user-app" className="flex flex-col items-center gap-2">
+                            <div className="w-14 h-14 bg-white border-2 border-slate-200 rounded-xl flex items-center justify-center shadow-md">
+                                <User className="w-7 h-7 text-slate-600" />
                             </div>
-
-                            {/* 三栏式主体布局 */}
-                            <div className="grid grid-cols-12 gap-4 mt-6">
-
-                                {/* 左列：控制平面 */}
-                                <div className="col-span-3">
-                                    <ControlPlanePanel />
-                                </div>
-
-                                {/* 中列：智能体编排层 */}
-                                <div className="col-span-6">
-                                    <AgentOrchestrationPanel />
-                                </div>
-
-                                {/* 右列：模型运行时 */}
-                                <div className="col-span-3">
-                                    <ModelRuntimePanel />
-                                </div>
-                            </div>
-
-                            {/* Agent 运行时标识 */}
-                            <div className="flex items-center justify-center gap-4 text-sm text-slate-500 mt-6 pt-4 border-t border-slate-200">
-                                <span className="font-black text-slate-400 uppercase tracking-widest text-xs">Agents Runtime:</span>
-                                <RuntimeBadge label="Cloud Run" />
-                                <span className="text-slate-300">|</span>
-                                <RuntimeBadge label="Agent Engine" />
-                                <span className="text-slate-300">|</span>
-                                <RuntimeBadge label="GKE" />
-                            </div>
-
-                            {/* 工具层与基础设施 */}
-                            <div className="mt-6 pt-6 border-t-2 border-dashed border-slate-200">
-                                <div className="flex justify-center mb-3">
-                                    <FlowLabel label="MCP Protocol" step="5" />
-                                </div>
-                                <ToolsAndInfraPanel />
+                            <div className="text-center">
+                                <div className="text-sm font-bold text-slate-700">应用用户</div>
+                                <div className="text-xs text-slate-400">App Users</div>
                             </div>
                         </div>
-
-                        {/* 外部工具区域 */}
-                        <ConnectorVertical height={30} />
-                        <div className="flex justify-center mb-3">
-                            <FlowLabel label="External MCP Servers" />
+                        <div id="user-dev" className="flex flex-col items-center gap-2">
+                            <div className="w-14 h-14 bg-white border-2 border-slate-200 rounded-xl flex items-center justify-center shadow-md">
+                                <Code2 className="w-7 h-7 text-slate-600" />
+                            </div>
+                            <div className="text-center">
+                                <div className="text-sm font-bold text-slate-700">AI 开发者</div>
+                                <div className="text-xs text-slate-400">AI Developers</div>
+                            </div>
                         </div>
-                        <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-5 flex justify-center gap-6">
-                            <ToolNode icon={<Globe />} title="第三方 API" external />
-                            <ToolNode icon={<FileSearch />} title="外部文档库" external />
-                            <ToolNode icon={<Database />} title="公共数据源" external />
+                    </div>
+
+                    {/* Step 1: Prompt */}
+                    <div className="flex flex-col items-center mb-3">
+                        <div className="flex items-center gap-2 bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200">
+                            <span className="flex items-center justify-center w-6 h-6 bg-emerald-600 text-white text-xs font-black rounded-full">1</span>
+                            <span className="text-sm font-bold text-emerald-700">提示词 Prompt</span>
+                        </div>
+                        <div className="w-px h-4 bg-emerald-300"></div>
+                    </div>
+
+                    {/* ========== Frontend ========== */}
+                    <div className="flex justify-center mb-3">
+                        <div id="node-frontend" className="bg-white border-2 border-slate-300 rounded-xl px-6 py-3 shadow-md flex items-center gap-3">
+                            <Globe className="w-6 h-6 text-slate-600" />
+                            <div>
+                                <div className="font-bold text-slate-800 text-lg">前端服务</div>
+                                <div className="text-xs text-slate-500">Frontend Service</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Step 2: Response */}
+                    <div className="flex flex-col items-center mb-3">
+                        <div className="w-px h-3 bg-slate-300"></div>
+                        <div className="flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200">
+                            <span className="flex items-center justify-center w-6 h-6 bg-slate-500 text-white text-xs font-black rounded-full">2</span>
+                            <span className="text-sm font-bold text-slate-600">响应 Response</span>
+                        </div>
+                        <div className="w-px h-3 bg-slate-300"></div>
+                    </div>
+
+                    {/* ========== 企业环境大框 ========== */}
+                    <div className="bg-gradient-to-br from-blue-50/60 to-slate-50/40 border-2 border-blue-200 rounded-2xl p-5 relative">
+                        <div className="absolute -top-3.5 left-8 bg-blue-600 px-4 py-1.5 rounded-full text-sm font-black text-white shadow-lg flex items-center gap-2">
+                            <Shield className="w-4 h-4" /> 企业环境 Enterprise Environment
                         </div>
 
-                        {/* 底部运维角色 */}
-                        <div className="flex justify-center gap-12 mt-6">
-                            <UserNode title="平台管理员" subtitle="Platform Admin" icon={<User />} small />
-                            <UserNode title="DevOps 工程师" subtitle="DevOps Engineer" icon={<Server />} small />
+                        {/* 三栏布局 */}
+                        <div className="grid grid-cols-12 gap-4 mt-3">
+
+                            {/* === 左列：控制平面 === */}
+                            <div className="col-span-3">
+                                <div id="node-control-plane" className="bg-purple-50/70 border border-purple-200 rounded-2xl p-4 h-full">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Cpu className="w-5 h-5 text-purple-600" />
+                                        <div>
+                                            <div className="text-sm font-black text-purple-700">控制平面</div>
+                                            <div className="text-xs text-purple-400 uppercase">Control Plane</div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <CompactItem icon={<Cpu className="w-4 h-4" />} cn="意图编排" en="Orchestrator" />
+                                        <CompactItem icon={<Lock className="w-4 h-4" />} cn="身份管理" en="Identity" />
+                                        <CompactItem icon={<Brain className="w-4 h-4" />} cn="记忆管理" en="Memory" />
+                                        <CompactItem icon={<Activity className="w-4 h-4" />} cn="配额管理" en="Quota" />
+                                    </div>
+                                    <div className="mt-3 pt-2 border-t border-purple-100">
+                                        <div className="text-xs text-purple-400 uppercase mb-1.5">治理 Governance</div>
+                                        <div className="flex flex-wrap gap-1">
+                                            <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">审计</span>
+                                            <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">策略</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* === 中列：Agent 编排层 === */}
+                            <div className="col-span-5">
+                                <div id="orchestration-layer" className="bg-emerald-50/50 border-2 border-emerald-300 rounded-2xl p-4 relative h-full">
+                                    <div className="absolute -top-3 left-4 bg-emerald-600 px-3 py-1 rounded-full text-xs font-black text-white shadow">
+                                        智能体编排层 Agent Orchestration
+                                    </div>
+
+                                    {/* Coordinator */}
+                                    <div id="node-coordinator" className="bg-white border-2 border-emerald-400 rounded-xl p-3 mt-3 mb-3 shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                                <Cpu className="w-5 h-5 text-emerald-600" />
+                                            </div>
+                                            <div>
+                                                <div className="font-black text-slate-900 text-base">协调器代理</div>
+                                                <div className="text-xs text-emerald-600 font-bold uppercase">Coordinator Agent</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Step 3 */}
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="flex items-center justify-center w-5 h-5 bg-emerald-600 text-white text-xs font-black rounded-full">3</span>
+                                        <span className="text-xs font-bold text-slate-500">子代理调用 Subagent</span>
+                                    </div>
+
+                                    {/* 子代理模式 */}
+                                    <div className="grid grid-cols-2 gap-2 mb-3">
+                                        <div id="pattern-seq" className="bg-white border border-blue-200 rounded-lg p-2">
+                                            <div className="text-xs text-blue-500 font-bold mb-1.5">顺序 Sequential</div>
+                                            <div className="space-y-1.5">
+                                                <div className="bg-blue-50 rounded px-2 py-1 text-xs text-center font-medium">Task-A</div>
+                                                <div className="bg-blue-50 rounded px-2 py-1 text-xs text-center font-medium">Task-A.1</div>
+                                            </div>
+                                        </div>
+                                        <div id="pattern-iter" className="bg-white border border-orange-200 rounded-lg p-2">
+                                            <div className="text-xs text-orange-500 font-bold mb-1.5">迭代 Iterative ↺</div>
+                                            <div className="space-y-1.5">
+                                                <div className="bg-orange-50 rounded px-2 py-1 text-xs text-center font-medium">Task-B</div>
+                                                <div className="flex gap-1">
+                                                    <div className="bg-orange-50 rounded px-1.5 py-1 text-xs flex-1 text-center">Eval</div>
+                                                    <div className="bg-orange-50 rounded px-1.5 py-1 text-xs flex-1 text-center">Enhance</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Step 4 + Response Generator */}
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="flex items-center justify-center w-5 h-5 bg-emerald-600 text-white text-xs font-black rounded-full">4</span>
+                                    </div>
+                                    <div id="node-response-gen" className="bg-emerald-100 border border-emerald-300 rounded-lg p-2.5 flex items-center gap-2">
+                                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                                        <div>
+                                            <div className="font-bold text-slate-800 text-sm">响应生成器</div>
+                                            <div className="text-xs text-emerald-600">Response Generator</div>
+                                        </div>
+                                    </div>
+
+                                    {/* 运行时 */}
+                                    <div className="mt-2 pt-2 border-t border-emerald-200 flex items-center justify-center gap-2 text-xs text-slate-500">
+                                        <Globe className="w-3 h-3" /> Cloud Run
+                                        <span className="text-slate-300">|</span>
+                                        <Bot className="w-3 h-3" /> Agent Engine
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* === 右列：模型运行时 === */}
+                            <div className="col-span-4">
+                                <div id="model-runtime" className="bg-slate-50 border border-slate-200 rounded-2xl p-4 h-full">
+                                    <div className="text-xs font-bold text-slate-500 mb-3 uppercase">模型运行时 Model Runtime</div>
+
+                                    {/* Model Armor */}
+                                    <div id="node-model-armor" className="bg-white border-2 border-emerald-300 rounded-xl p-3 mb-3 flex items-center gap-3 shadow-sm">
+                                        <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                            <Shield className="w-5 h-5 text-emerald-600" />
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-slate-700 text-sm">模型护甲</div>
+                                            <div className="text-xs text-slate-500">Model Armor</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-center mb-2">
+                                        <div className="w-px h-4 bg-slate-300"></div>
+                                    </div>
+
+                                    {/* AI Model */}
+                                    <div id="node-ai-model" className="bg-white border border-slate-200 rounded-xl p-3">
+                                        <div className="flex items-center gap-2 mb-1.5">
+                                            <Brain className="w-5 h-5 text-blue-500" />
+                                            <div>
+                                                <div className="font-bold text-slate-700 text-sm">AI 模型</div>
+                                                <div className="text-xs text-slate-400">AI Model (Gemini)</div>
+                                            </div>
+                                        </div>
+                                        <div className="text-xs text-slate-500 ml-7">
+                                            Vertex AI / Cloud Run / GKE
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Xarrows Connections */}
-                        {/* 1. Control Bus: Coordinator <-> Control Plane */}
-                        <Xarrow
-                            start="node-control-plane"
-                            end="node-coordinator"
-                            color="#9333ea"
-                            strokeWidth={2}
-                            startAnchor="right"
-                            endAnchor="left"
-                            path="grid"
-                            showHead={false}
-                            dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
-                            labels={{ middle: <div className="text-[10px] text-purple-500 bg-white px-1 border border-purple-200 rounded">Policy</div> }}
-                        />
+                        {/* ========== MCP 区域 ========== */}
+                        <div className="mt-4 pt-3 border-t-2 border-dashed border-slate-200">
+                            <div className="flex items-center justify-center gap-2 mb-3">
+                                <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white text-xs font-black rounded-full">5</span>
+                                <span className="text-sm font-bold text-slate-600">MCP 客户端 MCP Clients</span>
+                            </div>
 
-                        {/* 2. Inference Pipeline: Subagents -> Runtime Ingress */}
-                        <Xarrow
-                            start="node-subagents"
-                            end="node-runtime-ingress"
-                            color="#2563eb"
-                            strokeWidth={3}
-                            startAnchor="right"
-                            endAnchor="top"
-                            path="smooth"
-                            curveness={0.5}
-                        />
+                            <div className="grid grid-cols-2 gap-4">
+                                {/* 内部工具 */}
+                                <div id="tools-internal" className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                                    <div className="text-xs font-bold text-blue-600 mb-2 uppercase">内部工具 Internal Tools</div>
+                                    <div className="flex gap-4">
+                                        <div className="flex flex-col items-center gap-1">
+                                            <Database className="w-5 h-5 text-blue-500" />
+                                            <span className="text-xs text-slate-600">数据库</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1">
+                                            <Code2 className="w-5 h-5 text-blue-500" />
+                                            <span className="text-xs text-slate-600">APIs</span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        {/* 3. Feedback Loop: Runtime Egress -> Generator */}
-                        <Xarrow
-                            start="node-runtime-egress"
-                            end="node-response-generator"
-                            color="#64748b"
-                            strokeWidth={2}
-                            startAnchor="bottom"
-                            endAnchor="right"
-                            path="smooth"
-                            curveness={0.8}
-                            dashness={true}
-                        />
-                    </Xwrapper>
-                </div>
-            </div >
+                                {/* 外部工具 */}
+                                <div id="tools-external" className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-3">
+                                    <div className="text-xs font-bold text-slate-500 mb-2 uppercase">外部工具 External Tools</div>
+                                    <div className="flex gap-4">
+                                        <div className="flex flex-col items-center gap-1">
+                                            <Globe className="w-5 h-5 text-slate-500" />
+                                            <span className="text-xs text-slate-500">服务</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1">
+                                            <FileSearch className="w-5 h-5 text-slate-500" />
+                                            <span className="text-xs text-slate-500">文件</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-            {/* 底部说明 */}
-            < div className="grid grid-cols-1 lg:grid-cols-2 gap-6" >
-                <TimelineSection />
-                <HighlightsSection />
-            </div >
-        </div >
+                        {/* 可观测性 */}
+                        <div className="mt-3 flex justify-center">
+                            <div className="bg-white border border-slate-200 rounded-lg px-4 py-2 flex items-center gap-2 shadow-sm">
+                                <Activity className="w-4 h-4 text-slate-500" />
+                                <span className="text-sm text-slate-600">可观测性 Observability</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ========== 底部角色 ========== */}
+                    <div className="flex justify-center gap-12 mt-4 pt-3 border-t border-slate-100">
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <User className="w-4 h-4" />
+                            <span>平台管理员 Admins</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <Server className="w-4 h-4" />
+                            <span>运维工程师 DevOps</span>
+                        </div>
+                    </div>
+
+                    {/* ========== 连接线 - 全部使用 grid 路径 ========== */}
+
+                    {/* 控制平面 -> Coordinator (策略) */}
+                    <Xarrow
+                        start="node-control-plane"
+                        end="node-coordinator"
+                        color="#9333ea"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor={{ position: "right", offset: { y: 0 } }}
+                        endAnchor={{ position: "left", offset: { y: 0 } }}
+                        showHead={true}
+                        headSize={5}
+                        dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
+                        gridBreak="50%"
+                        labels={{ middle: <div className="text-xs text-purple-500 bg-white px-2 py-0.5 rounded border border-purple-200">策略 Policy</div> }}
+                    />
+
+                    {/* Frontend -> Orchestration Layer */}
+                    <Xarrow
+                        start="node-frontend"
+                        end="orchestration-layer"
+                        color="#10b981"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor="bottom"
+                        endAnchor="top"
+                        showHead={true}
+                        headSize={5}
+                        gridBreak="50%"
+                    />
+
+                    {/* Coordinator -> Model Armor (推理请求) */}
+                    <Xarrow
+                        start="node-coordinator"
+                        end="node-model-armor"
+                        color="#64748b"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor={{ position: "right", offset: { y: 0 } }}
+                        endAnchor={{ position: "left", offset: { y: 0 } }}
+                        showHead={true}
+                        headSize={5}
+                        gridBreak="50%"
+                        labels={{ middle: <div className="text-xs text-slate-500 bg-white px-2 py-0.5 rounded">推理请求</div> }}
+                    />
+
+                    {/* Model Armor -> AI Model */}
+                    <Xarrow
+                        start="node-model-armor"
+                        end="node-ai-model"
+                        color="#64748b"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor="bottom"
+                        endAnchor="top"
+                        showHead={true}
+                        headSize={5}
+                        gridBreak="50%"
+                    />
+
+                    {/* AI Model -> Response Generator (推理响应) */}
+                    <Xarrow
+                        start="node-ai-model"
+                        end="node-response-gen"
+                        color="#10b981"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor={{ position: "left", offset: { y: 10 } }}
+                        endAnchor={{ position: "right", offset: { y: 0 } }}
+                        showHead={true}
+                        headSize={5}
+                        dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
+                        gridBreak="70%"
+                        labels={{ middle: <div className="text-xs text-emerald-500 bg-white px-2 py-0.5 rounded">推理响应</div> }}
+                    />
+
+                    {/* Orchestration -> Internal Tools (MCP) */}
+                    <Xarrow
+                        start="orchestration-layer"
+                        end="tools-internal"
+                        color="#3b82f6"
+                        strokeWidth={2}
+                        path="grid"
+                        startAnchor={{ position: "bottom", offset: { x: -30 } }}
+                        endAnchor="top"
+                        showHead={true}
+                        headSize={5}
+                        gridBreak="50%"
+                        labels={{ middle: <div className="text-xs text-blue-500 bg-white px-2 py-0.5 rounded border border-blue-200">MCP</div> }}
+                    />
+
+                </Xwrapper>
+            </div>
+        </div>
     );
 });
+
+// 紧凑型控制平面项组件
+const CompactItem = memo(({ icon, cn, en }) => (
+    <div className="flex items-center gap-2 bg-white rounded-lg px-2.5 py-1.5 border border-purple-100">
+        <div className="text-purple-500">{icon}</div>
+        <div>
+            <div className="text-xs font-bold text-purple-700">{cn}</div>
+            <div className="text-xs text-purple-400">{en}</div>
+        </div>
+    </div>
+));
+
+// 子代理卡片组件
+const SubagentBox = memo(({ label, sublabel, small }) => (
+    <div className={`bg-slate-50 border border-slate-200 rounded-lg ${small ? 'p-2' : 'p-3'} flex items-center gap-2`}>
+        <div className={`${small ? 'w-6 h-6' : 'w-8 h-8'} bg-white rounded flex items-center justify-center border border-slate-100`}>
+            <Bot className={`${small ? 'w-3 h-3' : 'w-4 h-4'} text-slate-500`} />
+        </div>
+        <div>
+            <div className={`font-bold text-slate-700 ${small ? 'text-xs' : 'text-sm'}`}>{label}</div>
+            <div className="text-[9px] text-slate-400">{sublabel}</div>
+        </div>
+    </div>
+));
 
 // ========== 三栏式面板组件 ==========
 
@@ -1261,3 +1520,300 @@ const InfraComponent = ({ name, icon, count }) => (
         {count && <div className="ml-auto text-[10px] font-black bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{count} NODES</div>}
     </div>
 );
+
+// =====================================================================
+// Schema 驱动的面板组件 (Data-Driven Panel Components)
+// 这些组件从 PROCESS_VIEW_SCHEMA 读取数据并渲染精美的 UI
+// LLM 只需修改 processViewSchema.js 即可影响这些视图
+// =====================================================================
+
+// 控制平面面板 - Schema 驱动版本
+const ControlPlanePanelFromSchema = memo(({ controlPlane }) => (
+    <div id="node-control-plane" className="bg-purple-50/50 border border-purple-200 rounded-2xl p-5 h-full relative">
+        <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 bg-purple-100 rounded-xl">
+                {getIcon(controlPlane.icon, 'w-5 h-5 text-purple-600')}
+            </div>
+            <div>
+                <div className="text-sm font-black text-purple-700">{controlPlane.label}</div>
+                <div className="text-[10px] text-purple-400 uppercase tracking-widest">{controlPlane.labelEn}</div>
+            </div>
+        </div>
+        <div className="space-y-3 relative z-10">
+            {controlPlane.components.map(comp => (
+                <ControlPlaneItem
+                    key={comp.id}
+                    icon={getIcon(comp.icon, 'w-4 h-4')}
+                    title={comp.label}
+                    desc={comp.labelEn}
+                />
+            ))}
+        </div>
+        <div className="mt-4 pt-4 border-t border-purple-100">
+            <div className="text-[10px] text-purple-400 uppercase tracking-widest mb-2">Policy Governance</div>
+            <div className="flex flex-wrap gap-1">
+                {controlPlane.governance.map(item => (
+                    <span key={item} className="text-[10px] bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full border border-purple-200">{item}</span>
+                ))}
+            </div>
+        </div>
+    </div>
+));
+
+// 智能体编排面板 - Schema 驱动版本
+const AgentOrchestrationPanelFromSchema = memo(({ orchestration, flowSteps }) => (
+    <div className="bg-emerald-50/30 border-2 border-emerald-200 rounded-2xl p-5 relative">
+        <div className="absolute -top-3 left-6 bg-emerald-600 px-4 py-1 rounded-full text-xs font-black text-white shadow-lg shadow-emerald-200">
+            {orchestration.label}
+        </div>
+
+        <div className="flex flex-col items-center gap-4 mt-4">
+            {/* 接入层 (Access Layer) */}
+            <div className="bg-white border-2 border-blue-100 rounded-xl p-3 flex items-center gap-3 shadow-md w-full max-w-md">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                    {getIcon(orchestration.accessLayer.icon, 'w-5 h-5 text-blue-500')}
+                </div>
+                <div>
+                    <div className="font-black text-slate-800 text-sm">{orchestration.accessLayer.label}</div>
+                    <div className="text-[10px] text-blue-500 font-bold uppercase tracking-widest">{orchestration.accessLayer.labelEn}</div>
+                </div>
+            </div>
+
+            <ConnectorVertical height={16} color="blue" arrow />
+
+            {/* Coordinator Agent */}
+            <div id="node-coordinator" className="bg-white border-2 border-emerald-300 rounded-2xl p-4 flex items-center gap-4 shadow-lg shadow-emerald-100 w-full max-w-md">
+                <div className="w-14 h-14 bg-emerald-100 border border-emerald-200 rounded-xl flex items-center justify-center">
+                    {getIcon(orchestration.coordinator.icon, 'w-7 h-7 text-emerald-600')}
+                </div>
+                <div>
+                    <div className="font-black text-lg text-slate-900">{orchestration.coordinator.label}</div>
+                    <div className="text-xs text-emerald-600 font-bold uppercase tracking-widest">{orchestration.coordinator.labelEn}</div>
+                </div>
+            </div>
+
+            {/* 流程标记 Step 2 & Step 3 */}
+            <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center gap-2">
+                    <FlowLabel label={flowSteps[1].label} step="2" />
+                </div>
+                <ConnectorVertical height={12} color="emerald" />
+
+                <div className="flex items-center gap-2">
+                    <FlowLabel label={flowSteps[2].label} step="3" />
+                </div>
+                <ConnectorVertical height={12} color="emerald" arrow />
+            </div>
+
+            {/* 子代理编排区域 - 双流程并排 */}
+            <div className="w-full grid grid-cols-2 gap-4">
+                {orchestration.subagentPatterns.map(pattern => (
+                    <div
+                        key={pattern.id}
+                        id={pattern.type === 'sequential' ? 'node-subagents' : undefined}
+                        className={`bg-white border-2 ${pattern.type === 'sequential' ? 'border-blue-200' : 'border-orange-200'} rounded-2xl p-4 relative`}
+                    >
+                        <div className={`absolute -top-2.5 left-4 ${pattern.type === 'sequential' ? 'bg-blue-500' : 'bg-orange-500'} px-3 py-0.5 rounded-full text-[10px] font-black text-white uppercase tracking-wider`}>
+                            {pattern.label}
+                        </div>
+                        <div className="flex flex-col items-center gap-3 mt-3">
+                            {pattern.agents.map((agent, idx) => (
+                                <React.Fragment key={agent.id}>
+                                    <SubagentNode
+                                        title={agent.label}
+                                        subtitle={agent.labelEn}
+                                        color={pattern.type === 'sequential' ? 'blue' : 'orange'}
+                                    />
+                                    {idx < pattern.agents.length - 1 && (
+                                        <ConnectorVertical height={16} color={pattern.type === 'sequential' ? 'blue' : 'orange'} arrow />
+                                    )}
+                                </React.Fragment>
+                            ))}
+                            {pattern.evaluators && (
+                                <>
+                                    <div className="flex items-center gap-2 w-full">
+                                        <div className="flex-1 h-px bg-orange-200"></div>
+                                        <span className="text-[10px] text-orange-400 italic">loop</span>
+                                        <div className="flex-1 h-px bg-orange-200"></div>
+                                    </div>
+                                    <div className="flex gap-2 w-full">
+                                        {pattern.evaluators.map(e => (
+                                            <SubagentNode
+                                                key={e.id}
+                                                title={e.label}
+                                                subtitle={e.labelEn}
+                                                color={e.id.includes('enhancer') ? 'purple' : 'orange'}
+                                                small
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="text-[10px] text-orange-400 italic bg-orange-50 px-2 py-0.5 rounded-full">
+                                        ↺ {pattern.loopCondition}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* 响应生成器 */}
+            <div className="flex items-center gap-2 mt-2">
+                <FlowLabel label={flowSteps[3].label} step="4" />
+            </div>
+            <ConnectorVertical height={16} color="emerald" />
+            <div id="node-response-generator" className="bg-emerald-100 border-2 border-emerald-300 rounded-2xl p-4 flex items-center gap-4 shadow-md w-full max-w-md">
+                <div className="w-12 h-12 bg-white border border-emerald-200 rounded-xl flex items-center justify-center">
+                    {getIcon(orchestration.responseGenerator.icon, 'w-6 h-6 text-emerald-600')}
+                </div>
+                <div>
+                    <div className="font-black text-slate-900">{orchestration.responseGenerator.label}</div>
+                    <div className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">{orchestration.responseGenerator.labelEn}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+));
+
+// 模型运行时面板 - Schema 驱动版本
+const ModelRuntimePanelFromSchema = memo(({ pipeline }) => (
+    <div className="h-full flex flex-col">
+        <div className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-blue-500"></div>
+
+            <div className="text-xs text-slate-400 font-bold uppercase tracking-widest text-center mb-3">{pipeline.label}</div>
+
+            {/* Ingress Point */}
+            <div id="node-runtime-ingress" className="flex justify-center mb-2">
+                <div className="text-[10px] text-slate-400 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Agent Requests
+                </div>
+            </div>
+
+            {/* 安全护栏 (Middleware) */}
+            <div className="bg-red-50 border-2 border-red-100 rounded-xl p-3 relative mb-2 z-10 shadow-sm">
+                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-8 bg-red-200 rounded-r"></div>
+                <div className="flex items-center gap-3 mb-2">
+                    {getIcon(pipeline.middleware.icon, 'w-5 h-5 text-red-500')}
+                    <div>
+                        <div className="text-xs font-black text-red-700 leading-none">{pipeline.middleware.label}</div>
+                        <div className="text-[9px] text-red-400 uppercase tracking-widest">{pipeline.middleware.labelEn}</div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1 relative">
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-red-200 opacity-20 text-4xl font-black">↓</div>
+                    {pipeline.middleware.checks.map(check => (
+                        <span key={check} className="text-[9px] bg-white text-red-500 px-1.5 py-0.5 rounded border border-red-100 text-center">{check}</span>
+                    ))}
+                </div>
+            </div>
+
+            {/* 管道连接 */}
+            <div className="flex justify-center -my-1 relative z-0">
+                <div className="w-0.5 h-6 bg-slate-200"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-1 text-[9px] text-slate-400 border border-slate-100 rounded-full">Safe</div>
+            </div>
+
+            {/* 模型运行时 */}
+            <div id="node-runtime-egress" className="bg-blue-50/50 border-2 border-blue-100 rounded-xl p-3 flex-1 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                    {getIcon(pipeline.modelEngine.icon, 'w-5 h-5 text-blue-500')}
+                    <div>
+                        <div className="text-xs font-black text-slate-700 leading-none">{pipeline.modelEngine.label}</div>
+                        <div className="text-[9px] text-blue-400 uppercase tracking-widest">{pipeline.modelEngine.labelEn}</div>
+                    </div>
+                </div>
+                <div className="space-y-1.5">
+                    {pipeline.modelEngine.options.map(opt => (
+                        <RuntimeOption key={opt.id} label={opt.label} highlight={opt.recommended} />
+                    ))}
+                </div>
+            </div>
+
+            {/* A2A 协议 */}
+            <div className="mt-auto pt-3 text-center">
+                <div className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 border border-indigo-100 rounded text-[9px] text-indigo-500 font-bold">
+                    <Activity className="w-3 h-3" /> {pipeline.protocols[0]}
+                </div>
+            </div>
+        </div>
+    </div>
+));
+
+// 工具与基础设施面板 - Schema 驱动版本
+const ToolsAndInfraPanelFromSchema = memo(({ tools, infra }) => (
+    <div className="grid grid-cols-2 gap-4">
+        {/* 内部工具 */}
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+            <div className="text-xs text-amber-600 font-black mb-3 uppercase tracking-widest">{tools.label}</div>
+            <div className="flex gap-2 flex-wrap">
+                {tools.internalTools.map(tool => (
+                    <ToolNode key={tool.id} icon={getIcon(tool.icon, 'w-6 h-6')} title={tool.label} />
+                ))}
+            </div>
+            <div className="text-[10px] text-amber-400 mt-2 text-center uppercase tracking-widest">{tools.protocol}</div>
+        </div>
+
+        {/* 基础设施 */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <div className="text-xs text-slate-500 font-black mb-3 uppercase tracking-widest">{infra.label}</div>
+            <div className="grid grid-cols-3 gap-2">
+                {infra.components.map(comp => (
+                    <InfraNode key={comp.id} icon={getIcon(comp.icon, 'w-5 h-5')} title={comp.label} items={comp.items} compact />
+                ))}
+            </div>
+            {infra.observability && (
+                <div className="flex justify-center mt-2">
+                    <Activity className="w-4 h-4 text-slate-300" />
+                    <span className="text-[10px] text-slate-400 ml-1">Observability</span>
+                </div>
+            )}
+        </div>
+    </div>
+));
+
+// 时序说明 - Schema 驱动版本
+const TimelineSectionFromSchema = memo(({ timeline }) => (
+    <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 p-10 rounded-[3rem] shadow-xl shadow-blue-50">
+        <h4 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+            <div className="p-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200">
+                <RotateCw className="w-6 h-6" />
+            </div>
+            请求处理全链路时序
+        </h4>
+        <div className="space-y-8">
+            {timeline.map((item) => (
+                <div key={item.step} className="flex gap-6 group/item">
+                    <div className="text-3xl font-black text-blue-600/20 tracking-tighter group-hover/item:text-blue-600/40 transition-colors pt-1">{item.step}</div>
+                    <div>
+                        <div className="text-xl font-black text-slate-800 mb-1">{item.title}</div>
+                        <p className="text-slate-500 font-bold leading-relaxed">{item.desc}</p>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+));
+
+// 架构亮点 - Schema 驱动版本
+const HighlightsSectionFromSchema = memo(({ highlights }) => (
+    <div className="bg-gradient-to-br from-purple-50 to-white border border-purple-100 p-10 rounded-[3rem] shadow-xl shadow-purple-50">
+        <h4 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+            <div className="p-2 bg-purple-600 text-white rounded-xl shadow-lg shadow-purple-200">
+                <Zap className="w-6 h-6" />
+            </div>
+            关键架构设计亮点
+        </h4>
+        <div className="grid grid-cols-1 gap-6">
+            {highlights.map((item) => (
+                <div key={item.title} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="text-purple-600">{getIcon(item.icon, 'w-5 h-5')}</div>
+                        <div className="text-lg font-black text-slate-900 leading-none">{item.title}</div>
+                    </div>
+                    <p className="text-sm text-slate-500 font-bold leading-relaxed">{item.desc}</p>
+                </div>
+            ))}
+        </div>
+    </div>
+));
