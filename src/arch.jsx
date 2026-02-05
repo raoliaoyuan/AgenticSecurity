@@ -529,7 +529,9 @@ const ProcessView = memo(() => {
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <CompactItem icon={<Cpu className="w-4 h-4" />} cn="意图编排" en="Orchestrator" />
+                                        <div id="node-cp-orchestrator">
+                                            <CompactItem icon={<Cpu className="w-4 h-4" />} cn="意图编排" en="Orchestrator" />
+                                        </div>
                                         <CompactItem icon={<Lock className="w-4 h-4" />} cn="身份管理" en="Identity" />
                                         <CompactItem icon={<Brain className="w-4 h-4" />} cn="记忆管理" en="Memory" />
                                         <CompactItem icon={<Activity className="w-4 h-4" />} cn="配额管理" en="Quota" />
@@ -552,8 +554,8 @@ const ProcessView = memo(() => {
                                     </div>
 
                                     {/* Coordinator */}
-                                    <div id="node-coordinator" className="bg-white border-2 border-emerald-400 rounded-xl p-3 mt-4 mb-6 shadow-sm">
-                                        <div className="flex items-center gap-3">
+                                    <div id="node-coordinator" className="bg-white border-2 border-emerald-400 rounded-xl p-3 mt-4 mb-6 shadow-sm w-fit mx-auto px-6">
+                                        <div className="flex items-center justify-center gap-3">
                                             <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                                                 <Cpu className="w-5 h-5 text-emerald-600" />
                                             </div>
@@ -596,7 +598,7 @@ const ProcessView = memo(() => {
                                         <span className="flex items-center justify-center w-5 h-5 bg-emerald-600 text-white text-xs font-black rounded-full">4</span>
                                         <span className="text-xs font-bold text-slate-500">结果整合 Result Aggregation</span>
                                     </div>
-                                    <div id="node-response-gen" className="bg-emerald-100 border border-emerald-300 rounded-lg p-3 flex items-center gap-2 shadow-sm">
+                                    <div id="node-response-gen" className="bg-emerald-100 border border-emerald-300 rounded-lg p-3 flex items-center justify-center gap-2 shadow-sm w-fit mx-auto px-6">
                                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                                         <div>
                                             <div className="font-bold text-slate-800 text-sm">响应生成器</div>
@@ -629,9 +631,7 @@ const ProcessView = memo(() => {
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-center mb-2">
-                                        <div className="w-px h-4 bg-slate-300"></div>
-                                    </div>
+                                    <div className="h-56"></div>
 
                                     {/* AI Model */}
                                     <div id="node-ai-model" className="bg-white border border-slate-200 rounded-xl p-3">
@@ -757,17 +757,16 @@ const ProcessView = memo(() => {
 
                     {/* 控制平面 -> Coordinator (策略) */}
                     <Xarrow
-                        start="node-control-plane"
+                        start="node-cp-orchestrator"
                         end="node-coordinator"
                         color="#9333ea"
                         strokeWidth={2}
-                        path="grid"
+                        path="straight"
                         startAnchor={{ position: "right", offset: { y: 0 } }}
                         endAnchor={{ position: "left", offset: { y: 0 } }}
                         showHead={true}
                         headSize={5}
                         dashness={{ strokeLen: 4, nonStrokeLen: 4 }}
-                        gridBreak="30%"
                         labels={{ middle: <div className="text-xs text-purple-500 bg-white px-2 py-0.5 rounded border border-purple-200 shadow-sm font-bold">策略 Policy</div> }}
                     />
 
