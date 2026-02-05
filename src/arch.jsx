@@ -43,11 +43,11 @@ const ArchitectureViz = () => {
 
     // Tab 配置
     const tabs = useMemo(() => [
-        { id: 'logical', label: '逻辑架构', icon: Shield, color: 'blue' },
-        { id: 'process', label: '运行架构', icon: Layers, color: 'purple' },
-        { id: 'development', label: '开发架构', icon: Code2, color: 'indigo' },
-        { id: 'data', label: '数据架构', icon: Database, color: 'cyan' },
-        { id: 'physical', label: '物理架构', icon: Server, color: 'emerald' }
+        { id: 'logical', label: '逻辑架构', icon: Shield, activeClass: 'bg-blue-600 text-white shadow-lg shadow-blue-200' },
+        { id: 'process', label: '运行架构', icon: Layers, activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-200' },
+        { id: 'development', label: '开发架构', icon: Code2, activeClass: 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' },
+        { id: 'data', label: '数据架构', icon: Database, activeClass: 'bg-cyan-600 text-white shadow-lg shadow-cyan-200' },
+        { id: 'physical', label: '物理架构', icon: Server, activeClass: 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' }
     ], []);
 
     return (
@@ -80,7 +80,7 @@ const ArchitectureViz = () => {
                         <button
                             key={tab.id}
                             onClick={() => handleTabChange(tab.id)}
-                            className={`px-5 py-2.5 rounded-xl text-base font-black transition-all duration-200 flex items-center gap-2 ${activeTab === tab.id ? `bg-${tab.color}-600 text-white shadow-lg shadow-${tab.color}-200` : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                            className={`px-5 py-2.5 rounded-xl text-base font-black transition-all duration-200 flex items-center gap-2 ${activeTab === tab.id ? tab.activeClass : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                         >
                             <tab.icon className="w-4 h-4" /> {tab.label}
                         </button>
@@ -117,43 +117,7 @@ const ArchitectureViz = () => {
                     </div>
                 )}
 
-                {/* 底部防御概要 */}
-                <div className="mt-16 bg-gradient-to-br from-blue-600 to-purple-700 text-white p-12 rounded-[3.5rem] flex flex-col lg:flex-row items-center justify-between gap-12 relative overflow-hidden">
-                    {/* 使用 CSS 替代外部纹理图片 */}
-                    <div className="absolute inset-0 opacity-10" style={{
-                        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
-                    }}></div>
-                    <div className="max-w-3xl relative z-10">
-                        <h4 className="text-4xl font-black mb-8 flex items-center gap-4">
-                            <div className="p-2 bg-white/20 rounded-xl">
-                                <CheckCircle2 className="w-10 h-10 text-green-300" />
-                            </div>
-                            架构安全防御综述
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                            {defenseItems.map(item => (
-                                <div key={item.title} className="group/summary">
-                                    <div className="text-2xl font-black mb-2 flex items-center gap-2 group-hover/summary:translate-x-1 transition-transform">
-                                        <span className="w-1.5 h-6 bg-white/30 rounded-full"></span>
-                                        {item.title}
-                                    </div>
-                                    <p className="text-lg text-white/70 font-medium leading-relaxed">{item.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="hidden lg:block text-right relative z-10">
-                        <div className="text-sm font-black opacity-30 mb-2 tracking-[0.5em] uppercase">Security Infrastructure</div>
-                        <div className="text-7xl font-black italic tracking-tighter opacity-100">SPEC 5.0</div>
-                        <div className="inline-block text-sm font-black bg-white text-blue-600 px-4 py-2 mt-6 rounded-full hover:scale-110 transition-transform cursor-pointer">
-                            READY FOR PRODUCTION
-                        </div>
-                    </div>
-                </div>
 
-                <footer className="mt-16 text-center text-slate-600 text-sm font-black tracking-[0.3em] uppercase pb-12">
-                    Antigravity Framework Infrastructure Specification • PREMIUM EDITION V5.0
-                </footer>
             </div>
         </div>
     );
