@@ -140,15 +140,24 @@ const LogicalView = memo(({ activeStep, setActiveStep }) => {
 
     return (
         <div className="space-y-6">
-            {/* 顶层威胁透视开关 - 视觉同步 Process View */}
-            <div className="flex justify-end pr-2">
-                <button
-                    onClick={() => setLocalShowThreats(!localShowThreats)}
-                    className={`px-5 py-2.5 rounded-2xl text-sm font-black transition-all duration-300 flex items-center gap-2 border shadow-sm ${localShowThreats ? 'bg-red-50 border-red-200 text-red-600 shadow-red-100/50 scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
-                >
-                    <Skull className={`w-4 h-4 ${localShowThreats ? 'animate-pulse' : ''}`} />
-                    {localShowThreats ? '威胁透视: ON' : '威胁透视: OFF'}
-                </button>
+            {/* 顶层威胁透视开关 - 视觉对齐 Process View 安全审计视图 */}
+            <div className="flex justify-end pr-2 mb-2">
+                <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-2 rounded-2xl border border-slate-100 shadow-sm">
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">OWASP Agentic AI</div>
+                        <div className="text-sm font-black text-slate-800 leading-none">威胁透视视图</div>
+                    </div>
+                    <button
+                        onClick={() => setLocalShowThreats(!localShowThreats)}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${localShowThreats ? 'bg-red-600 shadow-red-900/20' : 'bg-slate-200'}`}
+                    >
+                        <span
+                            className={`${localShowThreats ? 'translate-x-6' : 'translate-x-1'} inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 shadow-md flex items-center justify-center`}
+                        >
+                            {localShowThreats ? <Shield className="w-3 h-3 text-red-600" /> : <Lock className="w-3 h-3 text-slate-400" />}
+                        </span>
+                    </button>
+                </div>
             </div>
 
             {layers.map((layer, idx) => (

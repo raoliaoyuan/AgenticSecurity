@@ -85,14 +85,6 @@ const ArchitectureViz = () => {
                             <tab.icon className="w-4 h-4" /> {tab.label}
                         </button>
                     ))}
-                    <div className="w-px h-8 bg-slate-200 mx-2 self-center"></div>
-                    <button
-                        onClick={handleToggleThreats}
-                        className={`px-5 py-2.5 rounded-xl text-base font-black transition-colors duration-200 flex items-center gap-2 border ${showThreats ? 'bg-red-50 border-red-200 text-red-600 shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
-                    >
-                        <Skull className="w-4 h-4" />
-                        {showThreats ? '威胁透视: ON' : '威胁透视: OFF'}
-                    </button>
                 </div>
 
                 {/* 视图内容区域 */}
