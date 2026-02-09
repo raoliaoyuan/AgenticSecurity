@@ -6,10 +6,11 @@
 import React, { useState, memo } from 'react';
 import { layers, defenseItems } from './data/archData.jsx';
 import { LayerSection } from './components/CommonComponents';
-import { FileText, Download, ChevronDown, ChevronUp, Code } from 'lucide-react';
+import { FileText, Download, ChevronDown, ChevronUp, Code, Skull, Shield, Lock } from 'lucide-react';
 
-const LogicalView = memo(({ activeStep, setActiveStep, showThreats }) => {
+const LogicalView = memo(({ activeStep, setActiveStep }) => {
     const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+    const [localShowThreats, setLocalShowThreats] = useState(false);
 
     // 生成 Skills 描述文件 (通用版 - 适配任意架构文档)
     const generateSkillsDescription = () => {
@@ -139,6 +140,17 @@ const LogicalView = memo(({ activeStep, setActiveStep, showThreats }) => {
 
     return (
         <div className="space-y-6">
+            {/* 顶层威胁透视开关 - 视觉同步 Process View */}
+            <div className="flex justify-end pr-2">
+                <button
+                    onClick={() => setLocalShowThreats(!localShowThreats)}
+                    className={`px-5 py-2.5 rounded-2xl text-sm font-black transition-all duration-300 flex items-center gap-2 border shadow-sm ${localShowThreats ? 'bg-red-50 border-red-200 text-red-600 shadow-red-100/50 scale-105' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
+                >
+                    <Skull className={`w-4 h-4 ${localShowThreats ? 'animate-pulse' : ''}`} />
+                    {localShowThreats ? '威胁透视: ON' : '威胁透视: OFF'}
+                </button>
+            </div>
+
             {layers.map((layer, idx) => (
                 <LayerSection
                     key={layer.id}
@@ -146,7 +158,7 @@ const LogicalView = memo(({ activeStep, setActiveStep, showThreats }) => {
                     isLast={idx === layers.length - 1}
                     activeStep={activeStep}
                     setActiveStep={setActiveStep}
-                    showThreats={showThreats}
+                    showThreats={localShowThreats}
                 />
             ))}
 
