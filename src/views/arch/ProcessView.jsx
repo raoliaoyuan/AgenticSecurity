@@ -19,6 +19,130 @@ import { CompactItem, ConnectorVertical, FlowLabel, SubagentNode, RuntimeOption,
 const ProcessView = memo(() => {
     const schema = PROCESS_VIEW_SCHEMA;
     const [isDescriptionOpen, setIsDescriptionOpen] = React.useState(false);
+    const [showThreats, setShowThreats] = React.useState(false);
+
+    // OWASP Agentic AI 威胁数据 (T1-T17)
+    const THREATS_DATA = {
+        T1: {
+            name: "Memory Poisoning (记忆投毒)",
+            risk: "攻击者向记忆系统（短期/长期）注入虚假或恶意数据，误导代理决策。",
+            mitigation: "实施内存内容验证、会话隔离和定期清理建议。"
+        },
+        T2: {
+            name: "Tool Misuse (工具误用)",
+            risk: "攻击者诱导代理滥用已授权的工具执行非预期操作，如 Agent Hijacking。",
+            mitigation: "严格工具访问验证、率限制及执行监控。"
+        },
+        T3: {
+            name: "Privilege Compromise (权限提升)",
+            risk: "利用角色管理漏洞获取非授权的高级权限，绕过安全限制。",
+            mitigation: "实施细粒度权限控制 (RBAC/ABAC) 和零信任模型。"
+        },
+        T4: {
+            name: "Resource Overload (资源过载)",
+            risk: "故意消耗计算、内存或 API 配额，导致系统性能下降或完全失效。",
+            mitigation: "部署配额管理、频率限制和异常检测系统。"
+        },
+        T5: {
+            name: "Cascading Hallucinations (级联幻觉攻击)",
+            risk: "系统利用代理倾向生成似是而非的虚假信息，并在代理间传播，破坏决策。",
+            mitigation: "多源验证、输出一致性检查及人工复核。"
+        },
+        T6: {
+            name: "Intent Breaking (意图破坏与目标操纵)",
+            risk: "利用规划漏洞重定向代理目标，使其执行攻击者指定的恶意计划。",
+            mitigation: "规划验证框架，设置行为审计阈值。"
+        },
+        T7: {
+            name: "Misaligned Behavior (对齐失败与欺骗性行为)",
+            risk: "代理为达成目标而采取有害、非法或欺骗性手段（如绕过安全审计）。",
+            mitigation: "加强模型对齐训练，引入独立的监制代理。"
+        },
+        T8: {
+            name: "Repudiation & Untraceability (抵赖与不可追踪性)",
+            risk: "由于日志不全或被篡改，导致代理的操作无法溯源或追究责任。",
+            mitigation: "强制通过不可篡改的加密日志记录所有决策链路。"
+        },
+        T9: {
+            name: "Identity Spoofing (身份冒充与代理劫持)",
+            risk: "攻击者冒充代理或合法用户发起提权 API 调用，绕过对话防护。",
+            mitigation: "多因素认证 (MFA)，强化代理间双向身份验证。"
+        },
+        T10: {
+            name: "Overwhelming HITL (人机对话过载)",
+            risk: "制造大量干扰提问令监控人员疲劳，从而在“疲劳窗口”通过恶意行为。",
+            mitigation: "优化人工审核流，自动过滤低风险警报。"
+        },
+        T11: {
+            name: "Unexpected RCE (非预期远程代码执行)",
+            risk: "操纵代理生成的代码在沙箱外部运行，直接导致系统沦陷。",
+            mitigation: "严格限制代码执行环境，禁止访问敏感系统调用。"
+        },
+        T12: {
+            name: "Communication Poisoning (代理间通信投毒)",
+            risk: "在代理间通信通道（A2A）注入错误信息，破坏协作一致性。",
+            mitigation: "对所有代理间报文进行签名加密及一致性共识校验。"
+        },
+        T13: {
+            name: "Rogue Agents (流氓代理入侵)",
+            risk: "外部伪造代理混入多代理系统，潜伏式收集、传输敏感数据。",
+            mitigation: "严格的代理准入检查，实时行为基准监控。"
+        },
+        T14: {
+            name: "Human Attacks on Multi-Agent (对多代理系统的攻击)",
+            risk: "利用代理间的信任委托链，从薄弱环节渗透并扩展影响。",
+            mitigation: "实施任务分段隔离，限制跨代理的隐式授权。"
+        },
+        T15: {
+            name: "Human Manipulation (对用户的诱导与欺骗)",
+            risk: "利用用户对 AI 的信任，通过话术诱导用户执行转账或点击钓鱼链接。",
+            mitigation: "敏感响应标记，对输出中的链接和指令进行合规过滤。"
+        },
+        T16: {
+            name: "Insecure Inter-Agent Protocol (协议滥用)",
+            risk: "利用 MCP 或 A2A 等协议漏洞绕过同意流，实现后台静默操作。",
+            mitigation: "执行强身份验证协议，强制要求关键操作需用户主动确认。"
+        },
+        T17: {
+            name: "Supply Chain Compromise (供应链攻击)",
+            risk: "模型、插件或依赖库在上游被注入“传染性后门”。",
+            mitigation: "定期进行 AI 红蓝对抗演练，使用受信任的来源及签名库。"
+        }
+    };
+
+    // 威胁标记组件
+    const ThreatMarker = ({ id, position = "top-right", className = "" }) => {
+        if (!showThreats) return null;
+        const info = THREATS_DATA[id];
+        const posClass = {
+            "top-right": "-top-2 -right-2",
+            "top-left": "-top-2 -left-2",
+            "bottom-right": "-bottom-2 -right-2",
+            "bottom-left": "-bottom-2 -left-2"
+        }[position];
+
+        return (
+            <div className={`absolute ${posClass} z-50 group ${className}`}>
+                <div className="w-5 h-5 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg cursor-help transition-transform hover:scale-125 animate-pulse">
+                    {id}
+                </div>
+                {/* Tooltip */}
+                <div className="absolute hidden group-hover:block w-64 p-3 bg-slate-900 text-white rounded-xl shadow-2xl -translate-y-full mb-2 left-1/2 -translate-x-1/2 overflow-visible">
+                    <div className="font-bold text-red-400 mb-1 border-b border-white/10 pb-1 flex justify-between">
+                        <span>{info.name}</span>
+                        <span>{id}</span>
+                    </div>
+                    <p className="text-[10px] leading-relaxed mb-2 text-slate-300">
+                        <span className="text-red-300 font-bold">风险:</span> {info.risk}
+                    </p>
+                    <p className="text-[10px] leading-relaxed text-slate-400 italic">
+                        <span className="text-emerald-400 font-bold not-italic">缓解:</span> {info.mitigation}
+                    </p>
+                    <div className="absolute w-2 h-2 bg-slate-900 rotate-45 bottom-[-4px] left-1/2 -translate-x-1/2"></div>
+                </div>
+            </div>
+        );
+    };
 
     // 生成 Skills 描述文件
     const generateSkillsDescription = () => {
@@ -359,6 +483,24 @@ graph TD
                     <h3 className="text-3xl font-black text-slate-900">{schema.metadata.title}</h3>
                     <p className="text-slate-500 text-sm">{schema.metadata.subtitle}</p>
                 </div>
+
+                {/* 威胁开关 */}
+                <div className="ml-auto flex items-center gap-3">
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">OWASP Agentic AI</div>
+                        <div className="text-sm font-black text-slate-800 leading-none">安全审计视图</div>
+                    </div>
+                    <button
+                        onClick={() => setShowThreats(!showThreats)}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${showThreats ? 'bg-red-600 shadow-red-900/20' : 'bg-slate-200'}`}
+                    >
+                        <span
+                            className={`${showThreats ? 'translate-x-6' : 'translate-x-1'} inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 shadow-md flex items-center justify-center`}
+                        >
+                            {showThreats ? <Shield className="w-3 h-3 text-red-600" /> : <Lock className="w-3 h-3 text-slate-400" />}
+                        </span>
+                    </button>
+                </div>
             </div>
 
             {/* 主架构图 */}
@@ -366,7 +508,9 @@ graph TD
                 <Xwrapper>
                     {/* ========== 顶部：用户入口 ========== */}
                     <div className="flex justify-center gap-20 mb-4">
-                        <div id="user-app" className="flex flex-col items-center gap-2">
+                        <div id="user-app" className="flex flex-col items-center gap-2 relative">
+                            <ThreatMarker id="T9" position="top-left" />
+                            <ThreatMarker id="T10" position="top-right" />
                             <div className="w-14 h-14 bg-white border-2 border-slate-200 rounded-xl flex items-center justify-center shadow-md">
                                 <User className="w-7 h-7 text-slate-600" />
                             </div>
@@ -422,20 +566,24 @@ graph TD
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <div id="node-cp-orchestrator">
+                                        <div id="node-cp-orchestrator" className="relative">
+                                            <ThreatMarker id="T3" position="top-left" />
+                                            <ThreatMarker id="T6" position="top-right" />
                                             <CompactItem icon={<Cpu className="w-4 h-4" />} cn="意图编排" en="Orchestrator" />
                                         </div>
                                         <div id="node-identity">
                                             <CompactItem icon={<Lock className="w-4 h-4" />} cn="身份管理" en="Identity" />
                                         </div>
-                                        <div id="node-memory">
+                                        <div id="node-memory" className="relative">
+                                            <ThreatMarker id="T1" position="top-right" />
                                             <CompactItem icon={<Brain className="w-4 h-4" />} cn="记忆管理" en="Memory" />
                                         </div>
                                         <div id="node-quota">
                                             <CompactItem icon={<Activity className="w-4 h-4" />} cn="配额管理" en="Quota" />
                                         </div>
                                     </div>
-                                    <div className="mt-2 pt-1.5 border-t border-purple-100">
+                                    <div className="mt-2 pt-1.5 border-t border-purple-100 relative">
+                                        <ThreatMarker id="T8" position="bottom-right" />
                                         <div className="text-xs text-purple-400 uppercase mb-1.5">治理 Governance</div>
                                         <div className="flex flex-wrap gap-1">
                                             <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">审计</span>
@@ -453,7 +601,9 @@ graph TD
                                     </div>
 
                                     {/* Coordinator */}
-                                    <div id="node-coordinator" className="bg-white border-2 border-emerald-400 rounded-xl p-3 mt-4 mb-6 shadow-sm w-fit mx-auto px-6">
+                                    <div id="node-coordinator" className="bg-white border-2 border-emerald-400 rounded-xl p-3 mt-4 mb-6 shadow-sm w-fit mx-auto px-6 relative">
+                                        <ThreatMarker id="T4" position="top-left" />
+                                        <ThreatMarker id="T14" position="top-right" />
                                         <div className="flex items-center justify-center gap-3">
                                             <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
                                                 <Cpu className="w-5 h-5 text-emerald-600" />
@@ -473,14 +623,16 @@ graph TD
 
                                     {/* 子代理模式 */}
                                     <div className="grid grid-cols-2 gap-2 mb-3">
-                                        <div id="pattern-seq" className="bg-white border border-blue-200 rounded-lg p-2">
+                                        <div id="pattern-seq" className="bg-white border border-blue-200 rounded-lg p-2 relative">
+                                            <ThreatMarker id="T11" position="top-left" />
                                             <div className="text-xs text-blue-500 font-bold mb-1.5">顺序 Sequential</div>
                                             <div className="space-y-1.5">
                                                 <div className="bg-blue-50 rounded px-2 py-1 text-xs text-center font-medium">Task-A</div>
                                                 <div className="bg-blue-50 rounded px-2 py-1 text-xs text-center font-medium">Task-A.1</div>
                                             </div>
                                         </div>
-                                        <div id="pattern-iter" className="bg-white border border-orange-200 rounded-lg p-2">
+                                        <div id="pattern-iter" className="bg-white border border-orange-200 rounded-lg p-2 relative">
+                                            <ThreatMarker id="T13" position="top-right" />
                                             <div className="text-xs text-orange-500 font-bold mb-1.5">迭代 Iterative ↺</div>
                                             <div className="space-y-1.5">
                                                 <div className="bg-orange-50 rounded px-2 py-1 text-xs text-center font-medium">Task-B</div>
@@ -497,7 +649,8 @@ graph TD
                                         <span className="flex items-center justify-center w-5 h-5 bg-emerald-600 text-white text-xs font-black rounded-full">4</span>
                                         <span className="text-xs font-bold text-slate-500">结果整合 Result Aggregation</span>
                                     </div>
-                                    <div id="node-response-gen" className="bg-emerald-100 border border-emerald-300 rounded-lg p-3 flex items-center justify-center gap-2 shadow-sm w-fit mx-auto px-6">
+                                    <div id="node-response-gen" className="bg-emerald-100 border border-emerald-300 rounded-lg p-3 flex items-center justify-center gap-2 shadow-sm w-fit mx-auto px-6 relative">
+                                        <ThreatMarker id="T15" position="bottom-right" />
                                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                                         <div>
                                             <div className="font-bold text-slate-800 text-sm">响应生成器</div>
@@ -533,7 +686,10 @@ graph TD
                                     <div className="h-56"></div>
 
                                     {/* AI Model */}
-                                    <div id="node-ai-model" className="bg-white border border-slate-200 rounded-xl p-3">
+                                    <div id="node-ai-model" className="bg-white border border-slate-200 rounded-xl p-3 relative">
+                                        <ThreatMarker id="T5" position="top-left" />
+                                        <ThreatMarker id="T7" position="top-right" />
+                                        <ThreatMarker id="T17" position="bottom-right" />
                                         <div className="flex items-center gap-2 mb-1.5">
                                             <Brain className="w-5 h-5 text-blue-500" />
                                             <div>
@@ -558,7 +714,8 @@ graph TD
 
                             <div className="grid grid-cols-2 gap-4">
                                 {/* 内部工具 */}
-                                <div id="tools-internal" className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                                <div id="tools-internal" className="bg-blue-50 border border-blue-200 rounded-xl p-3 relative">
+                                    <ThreatMarker id="T2" position="top-left" />
                                     <div className="text-xs font-bold text-blue-600 mb-2 uppercase">内部工具 Internal Tools</div>
                                     <div className="flex gap-4">
                                         <div className="flex flex-col items-center gap-1">
@@ -770,7 +927,7 @@ graph TD
                         showHead={true}
                         headSize={4}
                         gridBreak="30%"
-                        labels={{ middle: <div className="text-[9px] text-emerald-600 bg-white px-1 rounded border border-emerald-100 shadow-xs">分发 Dispatch</div> }}
+                        labels={{ middle: <div className="text-[9px] text-emerald-600 bg-white px-1 rounded border border-emerald-100 shadow-xs relative"><ThreatMarker id="T12" position="top-left" className="-mt-1 -ml-4" />分发 Dispatch</div> }}
                     />
 
                     {/* Subagents -> Response Generator (汇总) */}
@@ -810,7 +967,7 @@ graph TD
                         showHead={true}
                         headSize={5}
                         gridBreak="50%"
-                        labels={{ middle: <div className="text-xs text-blue-500 bg-white px-2 py-0.5 rounded border border-blue-200 shadow-sm font-bold">内部调用 MCP</div> }}
+                        labels={{ middle: <div className="text-xs text-blue-500 bg-white px-2 py-0.5 rounded border border-blue-200 shadow-sm font-bold relative"><ThreatMarker id="T16" position="top-left" className="-mt-2 -ml-4" />内部调用 MCP</div> }}
                     />
 
                     {/* Orchestration -> External Tools (MCP) */}
