@@ -140,8 +140,18 @@ const LogicalView = memo(({ activeStep, setActiveStep }) => {
 
     return (
         <div className="space-y-6">
-            {/* 顶层威胁透视开关 - 视觉对齐 Process View 安全审计视图 */}
-            <div className="flex justify-end pr-2 mb-2">
+            {/* 顶层标题区域与威胁透视开关 - 视觉对齐 Process View */}
+            <div className="flex items-center justify-between pr-2 mb-6">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100 shadow-sm">
+                        <Shield className="w-8 h-8 font-black" />
+                    </div>
+                    <div>
+                        <h3 className="text-3xl font-black text-slate-900 tracking-tight">逻辑架构视图 (Logical View)</h3>
+                        <p className="text-slate-500 text-sm font-medium">基于纵深防御原则的 MAS 企业级安全架构设计</p>
+                    </div>
+                </div>
+
                 <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-2 rounded-2xl border border-slate-100 shadow-sm">
                     <div className="text-right">
                         <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">OWASP Agentic AI</div>
