@@ -123,7 +123,7 @@ const ProcessView = memo(() => {
 
         return (
             <div className={`absolute ${posClass} z-50 group ${className}`}>
-                <div className="w-5 h-5 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg cursor-help transition-transform hover:scale-125 animate-pulse">
+                <div className="min-w-[22px] h-[22px] px-1 bg-red-600 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg cursor-help transition-transform hover:scale-125 animate-pulse">
                     {id}
                 </div>
                 {/* Tooltip */}
