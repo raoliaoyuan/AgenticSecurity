@@ -33,12 +33,18 @@ const IdentityAuthView = memo(() => {
     const enLabelStyle = "text-[9px] text-slate-400 uppercase tracking-tighter font-bold mt-0.5 text-center";
     const subLabelStyle = "text-[9px] text-blue-500/70 font-bold mt-1.5 text-center bg-blue-50/50 px-2 py-0.5 rounded-full";
 
-    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk }) => (
+    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk }) => (
         <div id={id} className={`${boxStyle} ${customWidth ? customWidth : 'w-48'}`}>
             {hasSdk && (
-                <div className="absolute -top-3 -right-3 bg-slate-900 text-white px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg ring-2 ring-white z-20 transition-transform hover:scale-110">
-                    <Layers size={10} className="text-blue-400" />
+                <div className="absolute -top-3 -right-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg shadow-teal-500/25 ring-2 ring-white z-20 transition-transform hover:scale-110">
+                    <Layers size={10} className="text-teal-100" />
                     <span className="text-[8px] font-black tracking-tighter">AGENT IDENTITY SDK</span>
+                </div>
+            )}
+            {hasIamSdk && (
+                <div className="absolute -bottom-3 -right-3 bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg shadow-indigo-500/25 ring-2 ring-white z-20 transition-transform hover:scale-110">
+                    <Key size={10} className="text-indigo-100" />
+                    <span className="text-[8px] font-black tracking-tighter">IAM SDK</span>
                 </div>
             )}
             <div className={`p-3 rounded-2xl ${bgClass} ${colorClass}`}>
@@ -87,9 +93,11 @@ const IdentityAuthView = memo(() => {
                             <Globe size={14} className="text-slate-400" />
                             <span>外部 (客户端)</span>
                         </div>
-                        <div className="flex flex-col gap-6 items-center">
+                        <div className="flex flex-col items-center">
                             <Node id="user" icon={User} label="终端用户" enLabel="End User" subLabel="MFA 认证" colorClass="text-blue-600" bgClass="bg-blue-50" customWidth="w-44" />
-                            <Node id="frontend" icon={Globe} label="前端服务" enLabel="Frontend Service" subLabel="身份代理 (Proxy)" colorClass="text-cyan-600" bgClass="bg-cyan-50" customWidth="w-44" />
+                            <div className="mt-[135px]">
+                                <Node id="frontend" icon={Globe} label="前端服务" enLabel="Frontend Service" subLabel="身份代理 (Proxy)" colorClass="text-cyan-600" bgClass="bg-cyan-50" customWidth="w-44" />
+                            </div>
                         </div>
                     </div>
 
@@ -106,55 +114,49 @@ const IdentityAuthView = memo(() => {
                             {/* 顶层：身份服务 + IAM */}
                             <div className="flex gap-8 items-stretch mb-10">
                                 {/* 智能体身份服务 */}
-                                <div id="identityServiceContainer" className="flex-1 p-5 bg-slate-900 rounded-[32px] text-white flex flex-col justify-between shadow-xl relative border-4 border-blue-500/30">
-                                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg ring-4 ring-slate-900 whitespace-nowrap">
-                                        Trusted Agent Center 智能体安全中心
-                                    </div>
+                                <div id="identityServiceContainer" className="flex-1 p-5 bg-gradient-to-br from-teal-800 via-teal-900 to-emerald-950 rounded-[32px] text-white flex flex-col justify-between shadow-xl shadow-teal-900/20 relative border-4 border-teal-500/20">
                                     <div className="flex items-center gap-5 w-full mb-4 px-2 mt-1">
-                                        <div className="p-2.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 shrink-0">
-                                            <BrainCircuit className="text-blue-400" size={30} />
+                                        <div className="p-2.5 rounded-2xl bg-teal-400/10 border border-teal-400/20 shrink-0">
+                                            <BrainCircuit className="text-teal-300" size={30} />
                                         </div>
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-lg font-black leading-tight">智能体身份服务</span>
+                                                <span className="text-lg font-black leading-tight">智能体身份服务控制面</span>
                                                 <div className="flex gap-1.5">
-                                                    <span className="px-1.5 py-0 bg-blue-500/10 text-blue-400 text-[8px] font-bold rounded border border-blue-500/20 uppercase flex items-center">A2A</span>
-                                                    <span className="px-1.5 py-0 bg-cyan-500/10 text-cyan-400 text-[8px] font-bold rounded border border-cyan-500/20 uppercase flex items-center">Zero Trust</span>
+                                                    <span className="px-1.5 py-0 bg-teal-400/15 text-teal-300 text-[8px] font-bold rounded border border-teal-400/25 uppercase flex items-center">A2A</span>
+                                                    <span className="px-1.5 py-0 bg-emerald-400/15 text-emerald-300 text-[8px] font-bold rounded border border-emerald-400/25 uppercase flex items-center">Zero Trust</span>
                                                 </div>
                                             </div>
-                                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Agent Identity Service</span>
+                                            <span className="text-[9px] text-teal-300/60 font-bold uppercase tracking-[0.2em] mt-0.5">Agent Identity Service Control Plane</span>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-4 gap-2 w-full">
-                                        <FeatureBox icon={BookOpen} title="智能体身份目录" enTitle="Identity Directory" activeColor="text-blue-400" />
-                                        <FeatureBox icon={ShieldCheck} title="智能体令牌保险库" enTitle="Token Vault" activeColor="text-blue-400" />
-                                        <FeatureBox icon={FileSearch} title="智能体策略检索" enTitle="Policy Retrieval" activeColor="text-blue-400" />
-                                        <FeatureBox icon={Zap} title="智能体身份解析器" enTitle="Identity Analyzer" activeColor="text-blue-400" />
+                                        <FeatureBox icon={BookOpen} title="智能体身份目录" enTitle="Identity Directory" activeColor="text-teal-300" />
+                                        <FeatureBox icon={ShieldCheck} title="智能体令牌保险库" enTitle="Token Vault" activeColor="text-teal-300" />
+                                        <FeatureBox icon={FileSearch} title="智能体策略检索" enTitle="Policy Retrieval" activeColor="text-teal-300" />
+                                        <FeatureBox icon={Zap} title="智能体身份解析器" enTitle="Identity Analyzer" activeColor="text-teal-300" />
                                     </div>
                                 </div>
 
                                 {/* IAM 服务 */}
-                                <div id="iamServiceContainer" className="w-[280px] shrink-0 p-5 bg-white rounded-[32px] text-slate-800 flex flex-col justify-between shadow-xl relative border-4 border-purple-100 group hover:border-purple-300 transition-all">
-                                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-purple-600 px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg ring-4 ring-white group-hover:scale-105 transition-transform whitespace-nowrap">
-                                        Infrastructure IAM 基础身份
-                                    </div>
+                                <div id="iamServiceContainer" className="w-[280px] shrink-0 p-5 bg-gradient-to-br from-indigo-800 via-indigo-900 to-violet-950 rounded-[32px] text-white flex flex-col justify-between shadow-xl shadow-indigo-900/20 relative border-4 border-indigo-500/20 group hover:border-indigo-400/40 transition-all">
                                     <div className="flex items-center gap-4 w-full mb-4 px-2 mt-1">
-                                        <div className="p-2.5 rounded-2xl bg-purple-50 border border-purple-100 group-hover:bg-purple-100 transition-colors shrink-0">
-                                            <Key className="text-purple-600" size={30} />
+                                        <div className="p-2.5 rounded-2xl bg-indigo-400/10 border border-indigo-400/20 group-hover:bg-indigo-400/15 transition-colors shrink-0">
+                                            <Key className="text-indigo-300" size={30} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-lg font-black leading-tight">IAM 服务</span>
-                                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5 group-hover:text-purple-400 transition-colors">IAM Service</span>
+                                            <span className="text-lg font-black leading-tight">IAM 服务控制面</span>
+                                            <span className="text-[9px] text-indigo-300/60 font-bold uppercase tracking-[0.2em] mt-0.5 group-hover:text-indigo-200/70 transition-colors">IAM Service Control Plane</span>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2 w-full">
-                                        <div className="px-2 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[8px] font-bold text-slate-600 flex items-center justify-center gap-1.5 group-hover:border-purple-200 transition-colors h-full">
-                                            <ShieldAlert size={12} className="text-purple-600 shrink-0" />
-                                            <span className="leading-tight">权限治理<br /><span className="scale-90 inline-block origin-left font-medium text-slate-400">(Governance)</span></span>
+                                        <div className="px-2 py-2 bg-indigo-700/30 rounded-xl border border-indigo-600/30 text-[8px] font-bold text-indigo-100 flex items-center justify-center gap-1.5 group-hover:border-indigo-500/40 transition-colors h-full">
+                                            <ShieldAlert size={12} className="text-violet-300 shrink-0" />
+                                            <span className="leading-tight">权限治理<br /><span className="scale-90 inline-block origin-left font-medium text-indigo-300/60">(Governance)</span></span>
                                         </div>
-                                        <div className="px-2 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[8px] font-bold text-slate-600 flex items-center justify-center gap-1.5 group-hover:border-purple-200 transition-colors h-full">
-                                            <Fingerprint size={12} className="text-purple-600 shrink-0" />
-                                            <span className="leading-tight">角色托管<br /><span className="scale-90 inline-block origin-left font-medium text-slate-400">(Hosting)</span></span>
+                                        <div className="px-2 py-2 bg-indigo-700/30 rounded-xl border border-indigo-600/30 text-[8px] font-bold text-indigo-100 flex items-center justify-center gap-1.5 group-hover:border-indigo-500/40 transition-colors h-full">
+                                            <Fingerprint size={12} className="text-violet-300 shrink-0" />
+                                            <span className="leading-tight">角色托管<br /><span className="scale-90 inline-block origin-left font-medium text-indigo-300/60">(Hosting)</span></span>
                                         </div>
                                     </div>
                                 </div>
@@ -169,15 +171,15 @@ const IdentityAuthView = memo(() => {
                                         <span>Agent Runtime / VPC</span>
                                     </div>
                                     <div className="flex gap-20 w-full justify-center items-start">
-                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" subLabel="任务编排" colorClass="text-indigo-600" bgClass="bg-indigo-50" hasSdk={true} />
-                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" subLabel="原子化执行" colorClass="text-emerald-600" bgClass="bg-emerald-50" hasSdk={true} />
+                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" subLabel="任务编排" colorClass="text-indigo-600" bgClass="bg-indigo-50" hasSdk={true} hasIamSdk={true} />
+                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" subLabel="原子化执行" colorClass="text-emerald-600" bgClass="bg-emerald-50" hasSdk={true} hasIamSdk={true} />
                                     </div>
                                 </div>
 
                                 {/* 后端资源列 */}
                                 <div className="w-[200px] shrink-0 flex flex-col gap-10 items-center pt-2">
-                                    <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" subLabel="核心推理" colorClass="text-purple-600" bgClass="bg-purple-50" customWidth="w-44" />
-                                    <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" subLabel="资源接口" colorClass="text-sky-600" bgClass="bg-sky-50" customWidth="w-44" />
+                                    <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" subLabel="核心推理" colorClass="text-purple-600" bgClass="bg-purple-50" customWidth="w-44" hasIamSdk={true} />
+                                    <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" subLabel="资源接口" colorClass="text-sky-600" bgClass="bg-sky-50" customWidth="w-44" hasIamSdk={true} />
                                 </div>
                             </div>
                         </div>
