@@ -265,11 +265,14 @@ const IdentityAuthView = memo(() => {
                         path="grid"
                     />
 
-                    {/* 4. 后端授权访问 */}
-                    <Xarrow start="identity-service" end="llm" color="#8b5cf6" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
-                    <Xarrow start="identity-service" end="cloud" color="#0ea5e9" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
-                    <Xarrow start="identity-service" end="external" color="#f59e0b" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
-                    <Xarrow start="identity-service" end="other-auth" color="#e11d48" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
+                    {/* 4. 智能体直接访问后端资源 */}
+                    {/* 协调智能体 -> 后端 */}
+                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
+                    <Xarrow start="orchestrator" end="cloud" color="#0ea5e9" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
+
+                    {/* 子智能体 -> 后端 */}
+                    <Xarrow start="sub-agent" end="external" color="#f59e0b" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
+                    <Xarrow start="sub-agent" end="other-auth" color="#e11d48" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
 
                 </div>
             </Xwrapper>
