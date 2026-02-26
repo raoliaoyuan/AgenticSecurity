@@ -102,7 +102,7 @@ const IdentityAuthView = memo(() => {
                             {/* 顶层：身份与权限双核心 */}
                             <div className="flex gap-10 items-stretch w-full justify-center mt-6 mb-16">
                                 {/* 智能体身份服务 */}
-                                <div id="identity-service" className="w-[560px] p-5 bg-slate-900 rounded-[32px] text-white flex flex-col justify-between shadow-xl relative border-4 border-blue-500/30">
+                                <div id="identityServiceContainer" className="w-[560px] p-5 bg-slate-900 rounded-[32px] text-white flex flex-col justify-between shadow-xl relative border-4 border-blue-500/30">
                                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg ring-4 ring-slate-900">
                                         Trusted Agent Center 智能体安全中心
                                     </div>
@@ -130,7 +130,7 @@ const IdentityAuthView = memo(() => {
                                 </div>
 
                                 {/* IAM 服务 */}
-                                <div id="iam-service" className="w-[320px] p-5 bg-white rounded-[32px] text-slate-800 flex flex-col justify-between shadow-xl relative border-4 border-purple-100 group hover:border-purple-300 transition-all">
+                                <div id="iamServiceContainer" className="w-[320px] p-5 bg-white rounded-[32px] text-slate-800 flex flex-col justify-between shadow-xl relative border-4 border-purple-100 group hover:border-purple-300 transition-all">
                                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-purple-600 px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg ring-4 ring-white group-hover:scale-105 transition-transform whitespace-nowrap">
                                         Infrastructure IAM 基础身份
                                     </div>
@@ -196,17 +196,18 @@ const IdentityAuthView = memo(() => {
 
                 {/* 连线与逻辑流转 */}
                 <Xarrow start="user" end="frontend" color="#2563eb" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="登录" enText="Login" />} headSize={4} />
-                <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor={["right", "bottom"]} endAnchor={["left", "top"]} path="smooth" labels={<ConnectionLabel text="委派" enText="Delegation" />} headSize={4} />
+                <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" labels={<ConnectionLabel text="委派" enText="Delegation" />} headSize={4} />
                 <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor="bottom" endAnchor="top" dashness={true} headSize={4} />
 
                 {/* 3. SDK 与身份服务交互 */}
-                <Xarrow start="orchestrator" end="identity-service" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="SDK Verify" color="text-blue-500" />} headSize={4} />
-                <Xarrow start="sub-agent" end="identity-service" color="#3b82f6" strokeWidth={2} startAnchor="left" endAnchor="bottom" path="smooth" curveness={0.8} labels={<ConnectionLabel text="SDK 申请" enText="SDK Request" color="text-blue-500" />} headSize={4} />
+                <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="SDK Verify" color="text-blue-500" />} headSize={4} />
+                {/* sub-agent 到 identityServiceContainer 由于跨度较大，交由 auto 自主寻找最近边 */}
+                <Xarrow start="sub-agent" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="auto" endAnchor="auto" path="smooth" labels={<ConnectionLabel text="SDK 申请" enText="SDK Request" color="text-blue-500" />} headSize={4} />
 
                 {/* 3.1 身份与 IAM 联动 (联邦映射) */}
                 <Xarrow
-                    start="identity-service"
-                    end="iam-service"
+                    start="identityServiceContainer"
+                    end="iamServiceContainer"
                     color="#6366f1"
                     strokeWidth={2}
                     dashness={true}
@@ -218,22 +219,22 @@ const IdentityAuthView = memo(() => {
                 />
 
                 {/* 4. 智能体直接访问后端资源 */}
-                <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" path="straight" dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="调用" enText="Call" color="text-purple-500" borderColor="border-purple-100" />} />
-                <Xarrow start="orchestrator" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="接入" enText="Access" color="text-sky-500" borderColor="border-sky-100" />} />
+                <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="调用" enText="Call" color="text-purple-500" borderColor="border-purple-100" />} />
+                <Xarrow start="orchestrator" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="auto" endAnchor="auto" path="smooth" dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="接入" enText="Access" color="text-sky-500" borderColor="border-sky-100" />} />
 
                 {/* 外部资源从下部连线 */}
                 <Xarrow start="sub-agent" end="external" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" path="smooth" dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="映射" enText="Mapping" color="text-amber-500" borderColor="border-amber-100" />} />
-                <Xarrow start="sub-agent" end="other-auth" color="#e11d48" strokeWidth={2} startAnchor="bottom" endAnchor="top" path="smooth" curveness={0.8} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="授权" enText="AuthZ" color="text-rose-500" borderColor="border-rose-100" />} />
+                <Xarrow start="sub-agent" end="other-auth" color="#e11d48" strokeWidth={2} startAnchor="bottom" endAnchor="top" path="smooth" dashness={{ strokeLen: 4, nonStrokeLen: 4 }} labels={<ConnectionLabel text="授权" enText="AuthZ" color="text-rose-500" borderColor="border-rose-100" />} />
 
                 {/* 5. IAM 治理与反馈回路 (闭环补全) */}
                 <Xarrow
-                    start="iam-service"
+                    start="iamServiceContainer"
                     end="cloud"
                     color="#a855f7"
                     strokeWidth={1.5}
                     dashness={true}
-                    startAnchor="bottom"
-                    endAnchor="top"
+                    startAnchor="auto"
+                    endAnchor="auto"
                     path="smooth"
                     labels={<ConnectionLabel text="策略围栏" enText="Policy Guard" color="text-purple-600" borderColor="border-purple-200" />}
                 />
@@ -249,7 +250,7 @@ const IdentityAuthView = memo(() => {
                     path="smooth"
                     labels={<ConnectionLabel text="结果返回" enText="Result Aggr" color="text-emerald-600" borderColor="border-emerald-100" />}
                     headSize={4}
-                    curveness={0.8}
+                    curveness={0.3}
                 />
 
                 {/* 最终响应 */}
@@ -258,12 +259,11 @@ const IdentityAuthView = memo(() => {
                     end="frontend"
                     color="#0891b2"
                     strokeWidth={2}
-                    startAnchor="bottom"
-                    endAnchor="right"
+                    startAnchor="auto"
+                    endAnchor="auto"
                     path="smooth"
                     labels={<ConnectionLabel text="任务完成" enText="Response" color="text-cyan-600" borderColor="border-cyan-100" />}
                     headSize={4}
-                    curveness={0.5}
                 />
             </Xwrapper>
 
