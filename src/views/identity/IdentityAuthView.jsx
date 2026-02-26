@@ -40,7 +40,7 @@ const IdentityAuthView = memo(() => {
         <div className="p-10 bg-slate-50/50 rounded-[40px] border border-slate-200 overflow-hidden">
             <div className="mb-10 text-center">
                 <h3 className="text-3xl font-black text-slate-900 mb-2">架构级身份认证链路</h3>
-                <p className="text-slate-500 font-medium">参考 AWS Bedrock AgentCore 的身份识别与 A2A 授权模型</p>
+                <p className="text-slate-500 font-medium">基于中立架构的智能体身份识别与 A2A 授权模型</p>
             </div>
 
             <Xwrapper>
@@ -62,7 +62,7 @@ const IdentityAuthView = memo(() => {
                                 id="orchestrator"
                                 icon={Workflow}
                                 label="Orchestrator Agent"
-                                subLabel="Amazon Bedrock"
+                                subLabel="Agent Execution Engine"
                                 colorClass="text-indigo-600"
                                 bgClass="bg-indigo-50"
                             />
@@ -75,7 +75,7 @@ const IdentityAuthView = memo(() => {
                             <Node
                                 id="agent-docs"
                                 icon={Cpu}
-                                label="AWS Docs Agent"
+                                label="Documentation Agent"
                                 subLabel="A2A Server Container"
                                 colorClass="text-emerald-600"
                                 bgClass="bg-emerald-50"
@@ -83,7 +83,7 @@ const IdentityAuthView = memo(() => {
                             <Node
                                 id="agent-blogs"
                                 icon={Cpu}
-                                label="AWS Blogs Agent"
+                                label="Knowledge Base Agent"
                                 subLabel="A2A Server Container"
                                 colorClass="text-emerald-600"
                                 bgClass="bg-emerald-50"
@@ -94,8 +94,8 @@ const IdentityAuthView = memo(() => {
                         <div id="identity-service" className="w-64 p-8 bg-slate-900 rounded-[32px] text-white flex flex-col items-center shadow-2xl relative">
                             <div className="absolute -top-4 bg-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">Trust Boundary</div>
                             <Shield className="text-blue-400 mb-4" size={48} />
-                            <span className="text-lg font-black leading-tight">AgentCore Identity Service</span>
-                            <span className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest text-center">Identity Bridge & IAM Exchange</span>
+                            <span className="text-lg font-black leading-tight">Agent Identity Service</span>
+                            <span className="text-[10px] text-slate-400 mt-2 uppercase tracking-widest text-center">Identity Bridge & Token Exchange</span>
 
                             <div className="mt-6 w-full space-y-2">
                                 <div className="bg-slate-800 p-2 rounded-xl flex items-center gap-2 border border-slate-700">
@@ -104,7 +104,7 @@ const IdentityAuthView = memo(() => {
                                 </div>
                                 <div className="bg-slate-800 p-2 rounded-xl flex items-center gap-2 border border-slate-700">
                                     <Key size={14} className="text-blue-400" />
-                                    <span className="text-[10px] font-bold">AWS SigV4 Translation</span>
+                                    <span className="text-[10px] font-bold">Platform Credential Translation</span>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ const IdentityAuthView = memo(() => {
                             <Node
                                 id="llm"
                                 icon={Box}
-                                label="Amazon Bedrock"
+                                label="Foundation Model"
                                 subLabel="LLM Infrastructure"
                                 colorClass="text-purple-600"
                                 bgClass="bg-purple-50"
@@ -185,7 +185,7 @@ const IdentityAuthView = memo(() => {
                         end="llm"
                         color="#10b981"
                         strokeWidth={2}
-                        labels={<ConnectionLabel text="Access" subtext="IAM Entitlement" />}
+                        labels={<ConnectionLabel text="Access" subtext="Credential Entitlement" />}
                         headSize={4}
                     />
                     <Xarrow
@@ -221,7 +221,7 @@ const IdentityAuthView = memo(() => {
                         <Lock className="text-emerald-500 w-5 h-5" />
                         <h4 className="font-black text-sm uppercase tracking-tight">Trust Bridge</h4>
                     </div>
-                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed">身份交换服务负责将 A2A Token 转换为目标资源的本地凭证（如 SigV4）。</p>
+                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed">身份交换服务负责将 A2A Token 转换为目标资源的本地凭证（如 Platform API Key / IAM）。</p>
                 </div>
             </div>
         </div>
