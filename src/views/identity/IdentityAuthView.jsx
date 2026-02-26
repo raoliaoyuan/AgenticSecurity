@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
+import { useWindowSize } from 'react-use';
 import Xarrow, { Xwrapper } from 'react-xarrows';
 import {
     User,
@@ -33,6 +34,17 @@ import {
 } from 'lucide-react';
 
 const IdentityAuthView = memo(() => {
+    const [showAuthView, setShowAuthView] = useState(false);
+    const [renderTick, setRenderTick] = useState(0);
+    const { width, height } = useWindowSize(); // Listen to window resize to fix offset lines
+
+    // Force re-render of arrows when auth view toggles or window resizes because node sizes change
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setRenderTick(prev => prev + 1);
+        }, 50); // Small delay to allow DOM to update first
+        return () => clearTimeout(timer);
+    }, [showAuthView, width, height]);
 
     const baseBoxStyle = "relative bg-white border-2 border-slate-100 shadow-sm z-10 transition-all hover:border-blue-200 hover:shadow-md";
     const boxStyle = `${baseBoxStyle} flex flex-col items-center justify-center p-4 rounded-[28px]`;
@@ -41,8 +53,14 @@ const IdentityAuthView = memo(() => {
     const enLabelStyle = "text-[9px] text-slate-400 uppercase tracking-tighter font-bold mt-0.5 text-center";
     const subLabelStyle = "text-[9px] text-blue-500/70 font-bold mt-1.5 text-center bg-blue-50/50 px-2 py-0.5 rounded-full";
 
-    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk, isRow = false }) => (
-        <div id={id} className={`${isRow ? rowBoxStyle : boxStyle} ${customWidth ? customWidth : (isRow ? 'w-full' : 'w-48')}`}>
+    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk, isRow = false, showAuthView, idpName }) => (
+        <div id={id} className={`${isRow ? rowBoxStyle : boxStyle} ${customWidth ? customWidth : (isRow ? 'w-full' : 'w-48')} relative`}>
+            {showAuthView && idpName && (
+                <div className={`absolute ${isRow ? '-top-2 -left-2' : '-top-3 -left-3'} bg-orange-500 text-white px-2 py-0.5 rounded-lg text-[8px] font-black shadow-md z-30 flex items-center gap-1`}>
+                    <ShieldCheck size={10} />
+                    {idpName}
+                </div>
+            )}
             {hasSdk && (
                 <div className={`absolute ${isRow ? '-top-1.5 -right-1.5 px-1.5 py-0.5' : '-top-3 -right-3 px-2 py-1'} bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-teal-500/25 ring-2 ring-white z-20`}>
                     <Layers size={isRow ? 8 : 10} className="text-teal-100" />
@@ -66,10 +84,18 @@ const IdentityAuthView = memo(() => {
         </div>
     );
 
-    const ConnectionLabel = ({ text, enText, color = "text-blue-600", borderColor = "border-blue-100" }) => (
-        <div className={`bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border ${borderColor} shadow-sm flex flex-col items-center`}>
-            <span className={`text-[9px] font-black leading-none ${color}`}>{text}</span>
+    const ConnectionLabel = ({ text, enText, color = "text-blue-600", borderColor = "border-blue-100", seq, authMethod, showAuthView }) => (
+        <div className={`bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border ${showAuthView && authMethod ? 'border-orange-300' : borderColor} shadow-sm flex flex-col items-center relative`}>
+            {showAuthView && seq && (
+                <div className="absolute -top-2 -left-2 w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-[9px] font-black shadow-md z-10">
+                    {seq}
+                </div>
+            )}
+            <span className={`text-[9px] font-black leading-none ${showAuthView && authMethod ? 'text-orange-600' : color}`}>{text}</span>
             <span className="text-[7px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{enText}</span>
+            {showAuthView && authMethod && (
+                <span className="text-[7px] bg-orange-100 text-orange-700 px-1 py-0.5 rounded mt-0.5 font-bold">{authMethod}</span>
+            )}
         </div>
     );
 
@@ -85,7 +111,21 @@ const IdentityAuthView = memo(() => {
 
     return (
         <div className="p-10 bg-slate-50/50 rounded-[40px] border border-slate-200 overflow-hidden">
-            <div className="mb-14 text-center">
+            <div className="mb-14 text-center relative">
+                <div className="absolute right-0 top-0 flex items-center gap-3">
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">Access Flow</div>
+                        <div className="text-sm font-black text-slate-800 leading-none">身份认证授权视图</div>
+                    </div>
+                    <button
+                        onClick={() => setShowAuthView(!showAuthView)}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${showAuthView ? 'bg-orange-500 shadow-orange-900/20' : 'bg-slate-200'}`}
+                    >
+                        <span className={`${showAuthView ? 'translate-x-6' : 'translate-x-1'} inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 shadow-md flex items-center justify-center`}>
+                            {showAuthView ? <ShieldCheck className="w-3 h-3 text-orange-600" /> : <Lock className="w-3 h-3 text-slate-400" />}
+                        </span>
+                    </button>
+                </div>
                 <div className="inline-block px-4 py-1.5 mb-4 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
                     Security Architecture 可视化安全架构
                 </div>
@@ -93,7 +133,7 @@ const IdentityAuthView = memo(() => {
                 <p className="text-slate-500 font-bold text-sm tracking-wide">Agent Identity Auth & AuthZ Architecture</p>
             </div>
 
-            <Xwrapper>
+            <Xwrapper key={renderTick}>
                 <div className="relative flex gap-6 items-start max-w-[1400px] mx-auto py-8">
                     {/* ====== 左列：外部（客户端） ====== */}
                     <div className="w-[200px] shrink-0 flex flex-col items-center border-[3px] border-dashed border-slate-300 bg-white/40 rounded-[40px] p-5 pt-12 relative shadow-sm">
@@ -102,9 +142,9 @@ const IdentityAuthView = memo(() => {
                             <span>外部 (客户端)</span>
                         </div>
                         <div className="flex flex-col items-center gap-0">
-                            <Node id="user" icon={User} label="终端用户" enLabel="End User" subLabel="MFA 认证" colorClass="text-blue-600" bgClass="bg-blue-50" customWidth="w-40" />
+                            <Node id="user" icon={User} label="终端用户" enLabel="End User" subLabel="MFA 认证" colorClass="text-blue-600" bgClass="bg-blue-50" customWidth="w-40" showAuthView={showAuthView} idpName="组织 IdP (OIDC)" />
                             <div className="h-[128px]" />
-                            <Node id="frontend" icon={Globe} label="前端服务" enLabel="Frontend Service" subLabel="身份代理 (Proxy)" colorClass="text-cyan-600" bgClass="bg-cyan-50" customWidth="w-40" />
+                            <Node id="frontend" icon={Globe} label="前端服务" enLabel="Frontend Service" subLabel="身份代理 (Proxy)" colorClass="text-cyan-600" bgClass="bg-cyan-50" customWidth="w-40" showAuthView={showAuthView} idpName="Identity Proxy" />
                         </div>
                     </div>
 
@@ -119,7 +159,13 @@ const IdentityAuthView = memo(() => {
 
                             {/* 第一行：身份服务 + IAM */}
                             <div className="flex gap-6 items-stretch mb-8">
-                                <div id="identityServiceContainer" className="flex-1 p-5 bg-gradient-to-br from-teal-800 via-teal-900 to-emerald-950 rounded-[32px] text-white flex flex-col justify-between shadow-xl shadow-teal-900/20 border-4 border-teal-500/20">
+                                <div id="identityServiceContainer" className="relative flex-1 p-5 bg-gradient-to-br from-teal-800 via-teal-900 to-emerald-950 rounded-[32px] text-white flex flex-col justify-between shadow-xl shadow-teal-900/20 border-4 border-teal-500/20">
+                                    {showAuthView && (
+                                        <div className="absolute -top-3 -left-3 bg-orange-500 text-white px-2 py-1 rounded-lg text-[9px] font-black shadow-md z-30 flex items-center gap-1">
+                                            <ShieldCheck size={12} />
+                                            Agent IdP (身份提供方)
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-4 mb-4 px-1">
                                         <div className="p-2.5 rounded-2xl bg-teal-400/10 border border-teal-400/20 shrink-0">
                                             <BrainCircuit className="text-teal-300" size={28} />
@@ -140,7 +186,13 @@ const IdentityAuthView = memo(() => {
                                     </div>
                                 </div>
 
-                                <div id="iamServiceContainer" className="w-[260px] shrink-0 p-5 bg-gradient-to-br from-indigo-800 via-indigo-900 to-violet-950 rounded-[32px] text-white flex flex-col justify-between shadow-xl shadow-indigo-900/20 border-4 border-indigo-500/20 group">
+                                <div id="iamServiceContainer" className="relative w-[260px] shrink-0 p-5 bg-gradient-to-br from-indigo-800 via-indigo-900 to-violet-950 rounded-[32px] text-white flex flex-col justify-between shadow-xl shadow-indigo-900/20 border-4 border-indigo-500/20 group">
+                                    {showAuthView && (
+                                        <div className="absolute -top-3 -right-3 bg-orange-500 text-white px-2 py-1 rounded-lg text-[9px] font-black shadow-md z-30 flex items-center gap-1">
+                                            <ShieldCheck size={12} />
+                                            Cloud IAM (凭证签发)
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-3 mb-4 px-1">
                                         <div className="p-2.5 rounded-2xl bg-indigo-400/10 border border-indigo-400/20 shrink-0">
                                             <Key className="text-indigo-300" size={28} />
@@ -167,8 +219,8 @@ const IdentityAuthView = memo(() => {
                                         <Server size={12} className="text-indigo-500" />
                                         <span>Agent Runtime / VPC</span>
                                     </div>
-                                    <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" />
-                                    <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" />
+                                    <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
+                                    <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
                                 </div>
 
                                 <div className="w-[240px] shrink-0 pt-[38px] pb-6 flex flex-col gap-4">
@@ -209,7 +261,7 @@ const IdentityAuthView = memo(() => {
                             </div>
                             <div className="flex gap-4 w-full justify-between items-start flex-nowrap">
                                 <div className="flex gap-4 flex-wrap justify-start items-start">
-                                    <Node id="oauth-provider" icon={UserCheck} label="OAuth / IdP" customWidth="w-36" colorClass="text-violet-600" bgClass="bg-violet-50" />
+                                    <Node id="oauth-provider" icon={UserCheck} label="OAuth / IdP" customWidth="w-36" colorClass="text-violet-600" bgClass="bg-violet-50" showAuthView={showAuthView} idpName="外部 SaaS IdP" />
                                     <Node id="saas-apps" icon={Users} label="SaaS 应用" customWidth="w-36" colorClass="text-blue-600" bgClass="bg-blue-50" />
                                     <div id="external" className="flex flex-col items-center">
                                         <div className="flex flex-col items-center p-3 bg-white rounded-2xl border-2 border-amber-100 shadow-lg w-[190px]">
@@ -234,30 +286,30 @@ const IdentityAuthView = memo(() => {
 
                     {/* ── 连线 ── */}
                     {/* 1. 用户 → 前端 */}
-                    <Xarrow start="user" end="frontend" color="#94a3b8" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="操作请求" enText="Request" />} headSize={4} />
+                    <Xarrow start="user" end="frontend" color="#94a3b8" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="操作请求" enText="Request" showAuthView={showAuthView} seq={1} authMethod="Session / JWT" />} headSize={4} />
 
                     {/* 2. 前端 ↔ 协调 */}
-                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" />} headSize={4} />
+                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" showAuthView={showAuthView} seq={2} authMethod="Token Exchange" />} headSize={4} />
                     <Xarrow start="orchestrator" end="frontend" color="#06b6d4" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 20 } }} endAnchor={{ position: "right", offset: { y: 20 } }} path="smooth" curveness={0.5} labels={<ConnectionLabel text="结果响应" enText="Response" />} headSize={4} />
 
                     {/* 3. 协调 ↔ 子智能体 */}
-                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor="bottom" endAnchor="top" dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor="bottom" endAnchor="top" dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" showAuthView={showAuthView} seq={5} authMethod="mTLS / Agent Token" />} headSize={4} />
                     <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "top", offset: { x: 45 } }} endAnchor={{ position: "bottom", offset: { x: 45 } }} labels={<ConnectionLabel text="结果聚合" enText="Aggr" />} headSize={4} />
 
                     {/* 4. 身份核验 */}
-                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" />} headSize={4} />
-                    <Xarrow start="identityServiceContainer" end="iamServiceContainer" color="#6366f1" strokeWidth={2} dashness={true} startAnchor="right" endAnchor="left" labels={<ConnectionLabel text="联邦同步" enText="Federation" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" showAuthView={showAuthView} seq={3} authMethod="SPIFFE ID / JWT" />} headSize={4} />
+                    <Xarrow start="identityServiceContainer" end="iamServiceContainer" color="#6366f1" strokeWidth={2} dashness={true} startAnchor="right" endAnchor="left" labels={<ConnectionLabel text="联邦同步" enText="Federation" showAuthView={showAuthView} seq={4} authMethod="Token Federation" />} headSize={4} />
 
                     {/* 5. 平台资源调用 */}
-                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" />} headSize={4} />
-                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" />} headSize={4} />
-                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" />} headSize={4} />
-                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" showAuthView={showAuthView} seq={6} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
 
                     {/* 6. Gateway & 外部链路 */}
-                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" showAuthView={showAuthView} seq={7} authMethod="Agent Token" />} headSize={4} />
                     <Xarrow start="gateway" end="oauth-provider" color="#7c3aed" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" dashness={true} headSize={4} />
-                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
+                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="访问应用" enText="Access" showAuthView={showAuthView} seq={8} authMethod="OAuth / API Key" />} headSize={4} />
                     <Xarrow start="gateway" end="external" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
                     <Xarrow start="gateway" end="other-auth" color="#e11d48" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" headSize={4} />
                     <Xarrow
