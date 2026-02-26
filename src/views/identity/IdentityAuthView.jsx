@@ -20,7 +20,8 @@ import {
     BookOpen,
     ShieldCheck,
     FileSearch,
-    BrainCircuit
+    BrainCircuit,
+    ShieldAlert
 } from 'lucide-react';
 
 const IdentityAuthView = memo(() => {
@@ -54,11 +55,11 @@ const IdentityAuthView = memo(() => {
         </div>
     );
 
-    const FeatureBox = ({ icon: Icon, title, enTitle }) => (
+    const FeatureBox = ({ icon: Icon, title, enTitle, activeColor = "text-blue-400" }) => (
         <div className="bg-slate-800/80 p-3 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors flex flex-col gap-1 items-start group">
             <div className="flex items-center gap-2">
-                <Icon size={14} className="text-blue-400 group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-black">{title}</span>
+                <Icon size={14} className={`${activeColor} group-hover:scale-110 transition-transform`} />
+                <span className="text-[10px] font-black text-white">{title}</span>
             </div>
             <span className="text-[8px] text-slate-500 font-bold uppercase tracking-tighter ml-5 group-hover:text-slate-400 transition-colors">{enTitle}</span>
         </div>
@@ -67,61 +68,65 @@ const IdentityAuthView = memo(() => {
     return (
         <div className="p-10 bg-slate-50/50 rounded-[40px] border border-slate-200 overflow-hidden">
             <div className="mb-14 text-center">
-                <div className="inline-block px-4 py-1.5 mb-4 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-200">
+                <div className="inline-block px-4 py-1.5 mb-4 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
                     Security Architecture 可视化安全架构
                 </div>
-                <h3 className="text-4xl font-black text-slate-900 mb-2">多维身份认证与授权架构 (双核心增强)</h3>
-                <p className="text-slate-500 font-bold text-sm tracking-wide">Multi-dimensional Identity Auth & AuthZ Architecture (Dual-Core Enhanced)</p>
+                <h3 className="text-4xl font-black text-slate-900 mb-2">多维身份认证与授权架构 (视觉平衡版)</h3>
+                <p className="text-slate-500 font-bold text-sm tracking-wide">Multi-dimensional Identity Auth & AuthZ Architecture (Visual Balanced)</p>
             </div>
 
             <Xwrapper>
                 <div className="relative flex flex-col gap-24 items-center max-w-[1400px] mx-auto py-5">
 
-                    {/* 顶部中心：双核心架构 */}
-                    <div className="flex gap-12 items-stretch">
+                    {/* 顶部中心：平衡双核心 */}
+                    <div className="flex gap-10 items-stretch">
 
-                        {/* 1. 智能体身份服务 */}
-                        <div id="identity-service" className="w-[600px] p-10 bg-slate-900 rounded-[50px] text-white flex flex-col items-center shadow-2xl relative border-4 border-blue-500/20">
-                            <div className="absolute -top-5 bg-blue-600 px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest shadow-xl ring-4 ring-slate-900">
+                        {/* 1. 智能体身份服务 (蓝色系 - 智能感) */}
+                        <div id="identity-service" className="w-[500px] p-8 bg-slate-900 rounded-[40px] text-white flex flex-col items-center shadow-xl relative border-4 border-blue-500/20">
+                            <div className="absolute -top-4 bg-blue-600 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ring-4 ring-slate-900">
                                 Trusted Agent Center 智能体安全中心
                             </div>
 
-                            <div className="flex items-center gap-12 w-full mb-8 px-4">
-                                <ShieldCheck className="text-blue-400" size={70} />
+                            <div className="flex items-center gap-8 w-full mb-6 px-2">
+                                <div className="p-4 rounded-3xl bg-blue-500/10 border border-blue-500/20">
+                                    <BrainCircuit className="text-blue-400" size={48} />
+                                </div>
                                 <div className="flex flex-col">
-                                    <span className="text-2xl font-black leading-tight">智能体身份服务</span>
-                                    <span className="text-[12px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1.5">Agent Identity Service</span>
-                                    <div className="mt-3 flex gap-2">
-                                        <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[8px] font-bold rounded border border-blue-500/20">A2A Protocol</span>
-                                        <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 text-[8px] font-bold rounded border border-cyan-500/20">Zero Trust</span>
+                                    <span className="text-xl font-black leading-tight">智能体身份服务</span>
+                                    <span className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">Agent Identity Service</span>
+                                    <div className="mt-2 flex gap-2">
+                                        <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[8px] font-bold rounded border border-blue-500/20 uppercase">A2A</span>
+                                        <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 text-[8px] font-bold rounded border border-cyan-500/20 uppercase">Zero Trust</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 w-full">
-                                <FeatureBox icon={BookOpen} title="智能体身份目录" enTitle="Agent Identity Directory" />
-                                <FeatureBox icon={ShieldCheck} title="智能体令牌保险库" enTitle="Agent Identity Token Vault" />
-                                <FeatureBox icon={FileSearch} title="智能体策略检索" enTitle="Agent Identity Policy Retrieval" />
-                                <FeatureBox icon={BrainCircuit} title="智能体身份解析器" enTitle="Agent Identity Analyzer" />
+                            <div className="grid grid-cols-2 gap-3 w-full">
+                                <FeatureBox icon={BookOpen} title="智能体身份目录" enTitle="Identity Directory" activeColor="text-blue-400" />
+                                <FeatureBox icon={ShieldCheck} title="智能体令牌保险库" enTitle="Token Vault" activeColor="text-blue-400" />
+                                <FeatureBox icon={FileSearch} title="智能体策略检索" enTitle="Policy Retrieval" activeColor="text-blue-400" />
+                                <FeatureBox icon={Zap} title="智能体身份解析器" enTitle="Identity Analyzer" activeColor="text-blue-400" />
                             </div>
                         </div>
 
-                        {/* 2. IAM 服务 (同级并列) */}
-                        <div id="iam-service" className="w-[320px] p-10 bg-slate-800 rounded-[50px] text-white flex flex-col items-center justify-center shadow-2xl relative border-4 border-slate-700/50 group hover:border-blue-500/30 transition-all">
-                            <div className="absolute -top-5 bg-slate-700 px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl ring-4 ring-slate-900 group-hover:bg-blue-600 transition-colors">
-                                Infrastructure IAM 基础身份管理
+                        {/* 2. IAM 服务 (紫色系 - 区分度) */}
+                        <div id="iam-service" className="w-[280px] p-8 bg-slate-800 rounded-[40px] text-white flex flex-col items-center justify-center shadow-xl relative border-4 border-purple-500/20 group hover:border-purple-500/40 transition-all">
+                            <div className="absolute -top-4 bg-purple-600 px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg ring-4 ring-slate-900 group-hover:scale-105 transition-transform">
+                                Infrastructure IAM 基础身份
                             </div>
-                            <Shield className="text-slate-400 group-hover:text-blue-400 transition-colors mb-6" size={60} />
+                            <div className="p-4 rounded-3xl bg-purple-500/10 border border-purple-500/20 mb-4 group-hover:bg-purple-500/20 transition-colors">
+                                <Key className="text-purple-400" size={42} />
+                            </div>
                             <div className="flex flex-col items-center">
-                                <span className="text-2xl font-black leading-tight text-center">IAM 服务</span>
-                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1 group-hover:text-slate-400 transition-colors uppercase">IAM Service</span>
-                                <div className="mt-6 flex flex-col gap-2 w-full px-4">
-                                    <div className="px-3 py-2 bg-slate-900/50 rounded-xl border border-slate-700 text-[9px] font-bold text-slate-400 flex items-center gap-2">
-                                        <Lock size={12} className="text-slate-500" />
+                                <span className="text-xl font-black leading-tight text-center">IAM 服务</span>
+                                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-0.5 group-hover:text-slate-400 transition-colors">IAM Service</span>
+                                <div className="mt-4 flex flex-col gap-2 w-full">
+                                    <div className="px-3 py-1.5 bg-slate-900/50 rounded-xl border border-slate-700 text-[8px] font-bold text-slate-400 flex items-center gap-2 group-hover:border-purple-500/30 transition-colors">
+                                        <ShieldAlert size={10} className="text-purple-500" />
                                         <span>权限治理 (Governance)</span>
                                     </div>
-                                    <div className="px-3 py-2 bg-slate-900/50 rounded-xl border border-slate-700 text-[9px] font-bold text-slate-400 flex items-center gap-2">
-                                        <Fingerprint size={12} className="text-slate-500" />
+                                    <div className="px-3 py-1.5 bg-slate-900/50 rounded-xl border border-slate-700 text-[8px] font-bold text-slate-400 flex items-center gap-2 group-hover:border-purple-500/30 transition-colors">
+                                        <Fingerprint size={10} className="text-purple-500" />
                                         <span>角色托管 (Hosting)</span>
                                     </div>
                                 </div>
@@ -129,44 +134,38 @@ const IdentityAuthView = memo(() => {
                         </div>
                     </div>
 
-                    {/* 中间层：用户、前端与智能体集群 */}
+                    {/* 下层集群：保持紧凑布局 */}
                     <div className="flex gap-20 items-start">
                         {/* 左侧：接入链路 */}
                         <div className="flex flex-col gap-24">
-                            <Node id="user" icon={User} label="终端用户" enLabel="End User" subLabel="多因素认证 (MFA)" colorClass="text-blue-600" bgClass="bg-blue-50" />
-                            <Node id="frontend" icon={Globe} label="前端服务" enLabel="Frontend Service" subLabel="Web / App 控制台" colorClass="text-cyan-600" bgClass="bg-cyan-50" />
+                            <Node id="user" icon={User} label="终端用户" enLabel="End User" subLabel="MFA 认证" colorClass="text-blue-600" bgClass="bg-blue-50" />
+                            <Node id="frontend" icon={Globe} label="前端服务" enLabel="Frontend Service" subLabel="身份代理 (Proxy)" colorClass="text-cyan-600" bgClass="bg-cyan-50" />
                         </div>
 
-                        {/* 中间：智能体集群 (SDK 集成) */}
+                        {/* 中间：智能体集群 */}
                         <div className="flex flex-col gap-24 pt-12">
-                            <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" subLabel="核心调度引擎" colorClass="text-indigo-600" bgClass="bg-indigo-50" hasSdk={true} />
-                            <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" subLabel="特化任务执行" colorClass="text-emerald-600" bgClass="bg-emerald-50" hasSdk={true} />
+                            <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" subLabel="任务编排" colorClass="text-indigo-600" bgClass="bg-indigo-50" hasSdk={true} />
+                            <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" subLabel="原子化执行" colorClass="text-emerald-600" bgClass="bg-emerald-50" hasSdk={true} />
                         </div>
 
-                        {/* 右侧：多元化后端集群 */}
+                        {/* 右侧：后端集群 */}
                         <div className="grid grid-cols-2 gap-8 pt-10">
-                            <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" subLabel="推理单元" colorClass="text-purple-600" bgClass="bg-purple-50" customWidth="w-44" />
-                            <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" subLabel="API 接入控制" colorClass="text-sky-600" bgClass="bg-sky-50" customWidth="w-44" />
-                            <Node id="external" icon={ExternalLink} label="外部服务" enLabel="External Service" subLabel="API Key 映射" colorClass="text-amber-600" bgClass="bg-amber-50" customWidth="w-44" />
-                            <Node id="other-auth" icon={Lock} label="其他资源" enLabel="Other Assets" subLabel="自定义资源组" colorClass="text-rose-600" bgClass="bg-rose-50" customWidth="w-44" />
+                            <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" subLabel="核心推理" colorClass="text-purple-600" bgClass="bg-purple-50" customWidth="w-40" />
+                            <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" subLabel="资源接口" colorClass="text-sky-600" bgClass="bg-sky-50" customWidth="w-40" />
+                            <Node id="external" icon={ExternalLink} label="外部服务" enLabel="External Service" subLabel="三方 API" colorClass="text-amber-600" bgClass="bg-amber-50" customWidth="w-40" />
+                            <Node id="other-auth" icon={Lock} label="其他资源" enLabel="Other Assets" subLabel="私有部署" colorClass="text-rose-600" bgClass="bg-rose-50" customWidth="w-40" />
                         </div>
                     </div>
 
                     {/* 连线与逻辑流转 */}
+                    <Xarrow start="user" end="frontend" color="#2563eb" strokeWidth={2} labels={<ConnectionLabel text="登录" enText="Login" />} headSize={4} />
+                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} labels={<ConnectionLabel text="委派" enText="Delegation" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} dashness={true} headSize={4} />
 
-                    {/* 1. 用户入口流程 */}
-                    <Xarrow start="user" end="frontend" color="#2563eb" strokeWidth={2} labels={<ConnectionLabel text="终端登录" enText="Login / MFA" />} headSize={4} />
-                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} labels={<ConnectionLabel text="委派请求" enText="Delegation" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="identity-service" color="#3b82f6" strokeWidth={2} labels={<ConnectionLabel text="SDK 核验" enText="SDK Verify" color="text-blue-500" />} headSize={4} path="grid" />
+                    <Xarrow start="sub-agent" end="identity-service" color="#3b82f6" strokeWidth={2} labels={<ConnectionLabel text="SDK 申请" enText="SDK Request" color="text-blue-500" />} headSize={4} path="grid" />
 
-                    {/* 2. A2A 编排流程 */}
-                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} dashness={true} labels={<ConnectionLabel text="A2A 协作" enText="A2A Collaboration" />} headSize={4} path="smooth" />
-
-                    {/* 3. SDK 与身份服务交互 */}
-                    <Xarrow start="orchestrator" end="identity-service" color="#3b82f6" strokeWidth={2} labels={<ConnectionLabel text="SDK 身份核验" enText="SDK Verify" color="text-blue-500" />} headSize={4} path="grid" />
-                    <Xarrow start="sub-agent" end="identity-service" color="#3b82f6" strokeWidth={2} labels={<ConnectionLabel text="SDK 凭证申请" enText="SDK Req Creds" color="text-blue-500" />} headSize={4} path="grid" />
-
-                    {/* 4. 智能体直接访问后端资源 */}
-                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" border="#ddd" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
+                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
                     <Xarrow start="orchestrator" end="cloud" color="#0ea5e9" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
                     <Xarrow start="sub-agent" end="external" color="#f59e0b" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
                     <Xarrow start="sub-agent" end="other-auth" color="#e11d48" strokeWidth={2} dashness={{ strokeLen: 4, nonStrokeLen: 4 }} />
@@ -174,27 +173,35 @@ const IdentityAuthView = memo(() => {
                 </div>
             </Xwrapper>
 
-            {/* 底部架构说明 */}
-            <div className="mt-24 grid grid-cols-4 gap-8 px-12">
-                <div className="flex flex-col items-center p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-center group hover:border-blue-200 transition-colors">
-                    <BookOpen className="text-blue-600 mb-4 group-hover:scale-110 transition-transform" size={28} />
-                    <h5 className="font-black text-sm uppercase tracking-tight mb-2">Service Directory</h5>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-medium">统一的信任根目录，管理智能体身份生命周期与全域身份凭证索引。</p>
+            {/* 底部详细说明 */}
+            <div className="mt-20 grid grid-cols-4 gap-6 px-10">
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all group">
+                    <div className="flex items-center gap-3 mb-3">
+                        <BrainCircuit size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
+                        <h5 className="font-black text-xs uppercase tracking-tight">Agent-First Identity</h5>
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">专为智能体设计的身份系统，提供基于行为解析与 A2A 协议的动态凭证管理。</p>
                 </div>
-                <div className="flex flex-col items-center p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-center group hover:border-blue-200 transition-colors">
-                    <ShieldCheck className="text-slate-900 mb-4 group-hover:scale-110 transition-transform" size={28} />
-                    <h5 className="font-black text-sm uppercase tracking-tight mb-2">Identity Hub</h5>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-medium">智能体专属身份中枢，支持跨供应商的令牌转换与实时的行为意图解析。</p>
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-purple-200 transition-all group">
+                    <div className="flex items-center gap-3 mb-3">
+                        <Key size={20} className="text-purple-600 group-hover:scale-110 transition-transform" />
+                        <h5 className="font-black text-xs uppercase tracking-tight">Infrastructure IAM</h5>
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">支撑底座的权限管理系统，负责物理资源、存储与传统的角色访问控制。</p>
                 </div>
-                <div className="flex flex-col items-center p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-center group hover:border-blue-200 transition-colors">
-                    <Shield className="text-indigo-600 mb-4 group-hover:scale-110 transition-transform" size={28} />
-                    <h5 className="font-black text-sm uppercase tracking-tight mb-2">Infrastructure IAM</h5>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-medium">传统的云基础设施访问管理系统，负责资源的底层权限授予与隔离。</p>
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-indigo-200 transition-all group">
+                    <div className="flex items-center gap-3 mb-3">
+                        <Layers size={20} className="text-indigo-600 group-hover:scale-110 transition-transform" />
+                        <h5 className="font-black text-xs uppercase tracking-tight">Integrated SDK</h5>
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">智能体通过内置 SDK 无缝接入安全中枢，实现从身份申请到令牌映射的全自动化。</p>
                 </div>
-                <div className="flex flex-col items-center p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-center group hover:border-blue-200 transition-colors">
-                    <Layers className="text-emerald-500 mb-4 group-hover:scale-110 transition-transform" size={28} />
-                    <h5 className="font-black text-sm uppercase tracking-tight mb-2">Integrated Boundary</h5>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-medium">智能体身份与云 IAM 深度集成，构建覆盖全链路的现代化安全边界。</p>
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-emerald-200 transition-all group">
+                    <div className="flex items-center gap-3 mb-3">
+                        <ShieldCheck size={20} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+                        <h5 className="font-black text-xs uppercase tracking-tight">Zero Trust Context</h5>
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">基于身份与全链路上下文的实时核验，构建覆盖智能体全生命周期的零信任边界。</p>
                 </div>
             </div>
         </div>
