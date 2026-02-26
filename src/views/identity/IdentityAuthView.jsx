@@ -239,10 +239,10 @@ const IdentityAuthView = memo(() => {
                 <Xarrow start="orchestrator" end="frontend" color="#06b6d4" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 25 } }} endAnchor={{ position: "right", offset: { y: 25 } }} path="smooth" curveness={0.6} labels={<ConnectionLabel text="结果响应" enText="Response" color="text-cyan-600" borderColor="border-cyan-100" />} headSize={4} />
 
                 {/* 5. 协调智能体 → 子智能体：编排调度，将子任务分发给子智能体 */}
-                <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -8 } }} endAnchor={{ position: "left", offset: { y: -8 } }} path="smooth" curveness={0.15} dashness={true} labels={<ConnectionLabel text="任务分发" enText="Task Dispatch" color="text-indigo-500" borderColor="border-indigo-100" />} headSize={4} />
+                <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -12 } }} endAnchor={{ position: "left", offset: { y: -12 } }} path="smooth" curveness={0.2} dashness={true} labels={<ConnectionLabel text="任务分发" enText="Task Dispatch" color="text-indigo-500" borderColor="border-indigo-100" />} headSize={4} />
 
                 {/* 6. 子智能体 → 协调智能体：子任务执行结果聚合返回 */}
-                <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 18 } }} endAnchor={{ position: "right", offset: { y: 18 } }} path="smooth" curveness={0.6} labels={<ConnectionLabel text="结果聚合" enText="Result Aggr" color="text-emerald-600" borderColor="border-emerald-100" />} headSize={4} />
+                <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 12 } }} endAnchor={{ position: "right", offset: { y: 12 } }} path="smooth" curveness={0.3} labels={<ConnectionLabel text="结果聚合" enText="Result Aggr" color="text-emerald-600" borderColor="border-emerald-100" />} headSize={4} />
 
                 {/* 7. 协调智能体 → 身份服务：通过 SDK 进行身份核验与令牌获取 */}
                 <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor={{ position: "bottom", offset: { x: -80 } }} path="smooth" curveness={0.3} labels={<ConnectionLabel text="SDK 核验" enText="SDK Verify" color="text-blue-500" />} headSize={4} />
