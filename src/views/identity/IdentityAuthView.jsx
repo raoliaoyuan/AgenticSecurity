@@ -102,24 +102,26 @@ const IdentityAuthView = memo(() => {
                             {/* 顶层：身份与权限双核心 */}
                             <div className="flex gap-10 items-stretch w-full justify-center mt-6 mb-16">
                                 {/* 智能体身份服务 */}
-                                <div id="identity-service" className="w-[420px] p-6 bg-slate-900 rounded-[32px] text-white flex flex-col items-center shadow-xl relative border-4 border-blue-500/30">
-                                    <div className="absolute -top-3.5 bg-blue-600 px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg ring-4 ring-slate-900">
+                                <div id="identity-service" className="w-[560px] p-5 bg-slate-900 rounded-[32px] text-white flex flex-col justify-between shadow-xl relative border-4 border-blue-500/30">
+                                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg ring-4 ring-slate-900">
                                         Trusted Agent Center 智能体安全中心
                                     </div>
-                                    <div className="flex items-center gap-6 w-full mb-5 px-2">
-                                        <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-                                            <BrainCircuit className="text-blue-400" size={36} />
+                                    <div className="flex items-center gap-5 w-full mb-4 px-2 mt-1">
+                                        <div className="p-2.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 shrink-0">
+                                            <BrainCircuit className="text-blue-400" size={30} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-lg font-black leading-tight">智能体身份服务</span>
-                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">Agent Identity Service</span>
-                                            <div className="mt-2 flex gap-2">
-                                                <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[8px] font-bold rounded border border-blue-500/20 uppercase">A2A</span>
-                                                <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 text-[8px] font-bold rounded border border-cyan-500/20 uppercase">Zero Trust</span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-lg font-black leading-tight">智能体身份服务</span>
+                                                <div className="flex gap-1.5">
+                                                    <span className="px-1.5 py-0 bg-blue-500/10 text-blue-400 text-[8px] font-bold rounded border border-blue-500/20 uppercase flex items-center">A2A</span>
+                                                    <span className="px-1.5 py-0 bg-cyan-500/10 text-cyan-400 text-[8px] font-bold rounded border border-cyan-500/20 uppercase flex items-center">Zero Trust</span>
+                                                </div>
                                             </div>
+                                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Agent Identity Service</span>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3 w-full">
+                                    <div className="grid grid-cols-4 gap-2 w-full">
                                         <FeatureBox icon={BookOpen} title="智能体身份目录" enTitle="Identity Directory" activeColor="text-blue-400" />
                                         <FeatureBox icon={ShieldCheck} title="智能体令牌保险库" enTitle="Token Vault" activeColor="text-blue-400" />
                                         <FeatureBox icon={FileSearch} title="智能体策略检索" enTitle="Policy Retrieval" activeColor="text-blue-400" />
@@ -128,25 +130,27 @@ const IdentityAuthView = memo(() => {
                                 </div>
 
                                 {/* IAM 服务 */}
-                                <div id="iam-service" className="w-[240px] p-6 bg-white rounded-[32px] text-slate-800 flex flex-col items-center justify-center shadow-xl relative border-4 border-purple-100 group hover:border-purple-300 transition-all">
-                                    <div className="absolute -top-3.5 bg-purple-600 px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg ring-4 ring-white group-hover:scale-105 transition-transform">
+                                <div id="iam-service" className="w-[320px] p-5 bg-white rounded-[32px] text-slate-800 flex flex-col justify-between shadow-xl relative border-4 border-purple-100 group hover:border-purple-300 transition-all">
+                                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-purple-600 px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg ring-4 ring-white group-hover:scale-105 transition-transform whitespace-nowrap">
                                         Infrastructure IAM 基础身份
                                     </div>
-                                    <div className="p-3 rounded-2xl bg-purple-50 border border-purple-100 mb-4 group-hover:bg-purple-100 transition-colors">
-                                        <Key className="text-purple-600" size={32} />
+                                    <div className="flex items-center gap-4 w-full mb-4 px-2 mt-1">
+                                        <div className="p-2.5 rounded-2xl bg-purple-50 border border-purple-100 group-hover:bg-purple-100 transition-colors shrink-0">
+                                            <Key className="text-purple-600" size={30} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-lg font-black leading-tight">IAM 服务</span>
+                                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5 group-hover:text-purple-400 transition-colors">IAM Service</span>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col items-center">
-                                        <span className="text-lg font-black leading-tight text-center">IAM 服务</span>
-                                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5 group-hover:text-purple-400 transition-colors">IAM Service</span>
-                                        <div className="mt-4 flex flex-col gap-2 w-full">
-                                            <div className="px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-200 text-[8px] font-bold text-slate-600 flex items-center gap-2 group-hover:border-purple-200 transition-colors">
-                                                <ShieldAlert size={10} className="text-purple-600" />
-                                                <span>权限治理 (Governance)</span>
-                                            </div>
-                                            <div className="px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-200 text-[8px] font-bold text-slate-600 flex items-center gap-2 group-hover:border-purple-200 transition-colors">
-                                                <Fingerprint size={10} className="text-purple-600" />
-                                                <span>角色托管 (Hosting)</span>
-                                            </div>
+                                    <div className="grid grid-cols-2 gap-2 w-full">
+                                        <div className="px-2 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[8px] font-bold text-slate-600 flex items-center justify-center gap-1.5 group-hover:border-purple-200 transition-colors h-full">
+                                            <ShieldAlert size={12} className="text-purple-600 shrink-0" />
+                                            <span className="leading-tight">权限治理<br /><span className="scale-90 inline-block origin-left font-medium text-slate-400">(Governance)</span></span>
+                                        </div>
+                                        <div className="px-2 py-2 bg-slate-50 rounded-xl border border-slate-200 text-[8px] font-bold text-slate-600 flex items-center justify-center gap-1.5 group-hover:border-purple-200 transition-colors h-full">
+                                            <Fingerprint size={12} className="text-purple-600 shrink-0" />
+                                            <span className="leading-tight">角色托管<br /><span className="scale-90 inline-block origin-left font-medium text-slate-400">(Hosting)</span></span>
                                         </div>
                                     </div>
                                 </div>
