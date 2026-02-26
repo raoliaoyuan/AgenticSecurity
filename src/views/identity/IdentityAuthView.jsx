@@ -33,31 +33,36 @@ import {
 } from 'lucide-react';
 
 const IdentityAuthView = memo(() => {
-    const boxStyle = "relative flex flex-col items-center justify-center p-4 bg-white border-2 border-slate-100 rounded-[28px] shadow-sm z-10 transition-all hover:border-blue-200 hover:shadow-md";
-    const labelStyle = "mt-3 text-[13px] font-black text-slate-800 text-center leading-tight";
+
+    const baseBoxStyle = "relative bg-white border-2 border-slate-100 shadow-sm z-10 transition-all hover:border-blue-200 hover:shadow-md";
+    const boxStyle = `${baseBoxStyle} flex flex-col items-center justify-center p-4 rounded-[28px]`;
+    const rowBoxStyle = `${baseBoxStyle} flex flex-row items-center justify-start py-2 px-3 gap-3 rounded-[16px] h-14`;
+    const labelStyle = "text-[13px] font-black text-slate-800 text-center leading-tight";
     const enLabelStyle = "text-[9px] text-slate-400 uppercase tracking-tighter font-bold mt-0.5 text-center";
     const subLabelStyle = "text-[9px] text-blue-500/70 font-bold mt-1.5 text-center bg-blue-50/50 px-2 py-0.5 rounded-full";
 
-    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk }) => (
-        <div id={id} className={`${boxStyle} ${customWidth ? customWidth : 'w-48'}`}>
+    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk, isRow = false }) => (
+        <div id={id} className={`${isRow ? rowBoxStyle : boxStyle} ${customWidth ? customWidth : (isRow ? 'w-full' : 'w-48')}`}>
             {hasSdk && (
-                <div className="absolute -top-3 -right-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg shadow-teal-500/25 ring-2 ring-white z-20 transition-transform hover:scale-110">
-                    <Layers size={10} className="text-teal-100" />
-                    <span className="text-[8px] font-black tracking-tighter">AGENT IDENTITY SDK</span>
+                <div className={`absolute ${isRow ? '-top-1.5 -right-1.5 px-1.5 py-0.5' : '-top-3 -right-3 px-2 py-1'} bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-teal-500/25 ring-2 ring-white z-20`}>
+                    <Layers size={isRow ? 8 : 10} className="text-teal-100" />
+                    <span className={`${isRow ? 'text-[7px]' : 'text-[8px]'} font-black tracking-tighter`}>AGENT SDK</span>
                 </div>
             )}
             {hasIamSdk && (
-                <div className="absolute -bottom-3 -right-3 bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg shadow-indigo-500/25 ring-2 ring-white z-20 transition-transform hover:scale-110">
-                    <Key size={10} className="text-indigo-100" />
-                    <span className="text-[8px] font-black tracking-tighter">IAM SDK</span>
+                <div className={`absolute ${isRow ? '-bottom-1.5 -right-1.5 px-1.5 py-0.5' : '-bottom-3 -right-3 px-2 py-1'} bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-indigo-500/25 ring-2 ring-white z-20`}>
+                    <Key size={isRow ? 8 : 10} className="text-indigo-100" />
+                    <span className={`${isRow ? 'text-[7px]' : 'text-[8px]'} font-black tracking-tighter`}>IAM SDK</span>
                 </div>
             )}
-            <div className={`p-3 rounded-2xl ${bgClass} ${colorClass}`}>
-                <Icon size={24} />
+            <div className={`${isRow ? 'p-1.5 rounded-xl' : 'p-3 rounded-2xl mt-3'} ${bgClass} ${colorClass} shrink-0`}>
+                <Icon size={isRow ? 18 : 24} />
             </div>
-            <span className={labelStyle}>{label}</span>
-            <span className={enLabelStyle}>{enLabel}</span>
-            {subLabel && <span className={subLabelStyle}>{subLabel}</span>}
+            <div className={`flex flex-col ${isRow ? 'items-start justify-center' : 'items-center'} min-w-0`}>
+                <span className={`${labelStyle} ${isRow ? 'mt-0 text-[12px]' : 'mt-3 text-[13px]'}`}>{label}</span>
+                <span className={`${enLabelStyle} ${isRow ? 'text-left mt-0 text-[8px]' : 'text-center'}`}>{enLabel}</span>
+                {subLabel && <span className={`${subLabelStyle} ${isRow ? 'mt-0.5' : 'mt-1.5'}`}>{subLabel}</span>}
+            </div>
         </div>
     );
 
@@ -157,33 +162,26 @@ const IdentityAuthView = memo(() => {
 
                             {/* 第二行：Agent Runtime + 后端资源 */}
                             <div className="flex gap-6 items-start">
-                                <div id="agentRuntime" className="flex-1 flex flex-col items-center border-2 border-dashed border-indigo-200 bg-indigo-50/40 rounded-3xl p-8 pt-10 relative">
+                                <div id="agentRuntime" className="flex-1 flex flex-col items-center justify-center gap-16 border-2 border-dashed border-indigo-200 bg-indigo-50/40 rounded-3xl p-8 pt-12 pb-12 relative min-h-[380px]">
                                     <div className="absolute -top-3.5 bg-indigo-100 px-4 py-1 rounded-full text-[9px] font-black uppercase text-indigo-700 border border-indigo-200 shadow-sm flex items-center gap-1.5">
                                         <Server size={12} className="text-indigo-500" />
                                         <span>Agent Runtime / VPC</span>
                                     </div>
-                                    <div className="flex flex-col items-center gap-10 w-full">
-                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-52" />
-                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-52" />
-                                    </div>
+                                    <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" />
+                                    <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" />
                                 </div>
 
-                                <div className="w-[290px] shrink-0 pt-[42px]">
-                                    <div className="grid grid-cols-2 gap-x-3 gap-y-10">
-                                        <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" hasIamSdk={true} customWidth="w-full" colorClass="text-purple-600" bgClass="bg-purple-50" />
-                                        <Node id="memory" icon={Brain} label="记忆服务" enLabel="Memory Service" hasIamSdk={true} customWidth="w-full" colorClass="text-pink-600" bgClass="bg-pink-50" />
-                                        <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" hasIamSdk={true} customWidth="w-full" colorClass="text-sky-600" bgClass="bg-sky-50" />
-                                        <Node id="knowledge-base" icon={Database} label="知识库" enLabel="Knowledge Base" hasIamSdk={true} customWidth="w-full" colorClass="text-green-600" bgClass="bg-green-50" />
-                                    </div>
-                                    <div className="mt-3">
-                                        <Node id="observability" icon={Activity} label="可观测性 / 审计" enLabel="Observability" colorClass="text-amber-600" bgClass="bg-amber-50" customWidth="w-full" />
-                                    </div>
+                                <div className="w-[240px] shrink-0 pt-[38px] pb-6 flex flex-col gap-4">
+                                    <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" hasIamSdk={true} colorClass="text-purple-600" bgClass="bg-purple-50" isRow={true} />
+                                    <Node id="memory" icon={Brain} label="记忆服务" enLabel="Memory Service" hasIamSdk={true} colorClass="text-pink-600" bgClass="bg-pink-50" isRow={true} />
+                                    <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" hasIamSdk={true} colorClass="text-sky-600" bgClass="bg-sky-50" isRow={true} />
+                                    <Node id="knowledge-base" icon={Database} label="知识库" enLabel="Knowledge Base" hasIamSdk={true} colorClass="text-green-600" bgClass="bg-green-50" isRow={true} />
                                 </div>
                             </div>
 
                             {/* 第三行：Agent Gateway */}
-                            <div className="mt-6">
-                                <div id="gateway" className="w-full px-5 py-4 bg-gradient-to-r from-orange-900 via-amber-900 to-orange-900 rounded-[20px] text-white flex items-center justify-between shadow-lg border-2 border-amber-600/20">
+                            <div className="mt-6 flex justify-start">
+                                <div id="gateway" className="w-[calc(100%-320px)] px-5 py-4 bg-gradient-to-r from-orange-900 via-amber-900 to-orange-900 rounded-[20px] text-white flex items-center justify-between shadow-lg border-2 border-amber-600/20">
                                     <div className="flex items-center gap-3">
                                         <Network className="text-amber-300" size={24} />
                                         <div>
@@ -209,57 +207,71 @@ const IdentityAuthView = memo(() => {
                                 <ExternalLink size={14} className="text-slate-400" />
                                 <span>外部组件 (资源) / External Resources</span>
                             </div>
-                            <div className="flex gap-4 w-full justify-center items-start flex-wrap">
-                                <Node id="oauth-provider" icon={UserCheck} label="OAuth / IdP" customWidth="w-36" colorClass="text-violet-600" bgClass="bg-violet-50" />
-                                <Node id="saas-apps" icon={Users} label="SaaS 应用" customWidth="w-36" colorClass="text-blue-600" bgClass="bg-blue-50" />
-                                <div id="external" className="flex flex-col items-center">
-                                    <div className="flex flex-col items-center p-4 bg-white rounded-2xl border-2 border-amber-100 shadow-lg w-[210px]">
-                                        <ExternalLink className="text-amber-600 mb-2" size={22} />
-                                        <span className="text-sm font-black">外部服务</span>
-                                        <div className="grid grid-cols-4 gap-1 w-full mt-2">
-                                            <div className="bg-amber-50 p-1 text-[7px] text-center rounded">MCP</div>
-                                            <div className="bg-amber-50 p-1 text-[7px] text-center rounded">CLI</div>
-                                            <div className="bg-amber-50 p-1 text-[7px] text-center rounded">API</div>
-                                            <div className="bg-amber-50 p-1 text-[7px] text-center rounded">其他</div>
+                            <div className="flex gap-4 w-full justify-between items-start flex-nowrap">
+                                <div className="flex gap-4 flex-wrap justify-start items-start">
+                                    <Node id="oauth-provider" icon={UserCheck} label="OAuth / IdP" customWidth="w-36" colorClass="text-violet-600" bgClass="bg-violet-50" />
+                                    <Node id="saas-apps" icon={Users} label="SaaS 应用" customWidth="w-36" colorClass="text-blue-600" bgClass="bg-blue-50" />
+                                    <div id="external" className="flex flex-col items-center">
+                                        <div className="flex flex-col items-center p-3 bg-white rounded-2xl border-2 border-amber-100 shadow-lg w-[190px]">
+                                            <ExternalLink className="text-amber-600 mb-2" size={20} />
+                                            <span className="text-sm font-black">外部服务</span>
+                                            <div className="grid grid-cols-4 gap-1 w-full mt-2">
+                                                <div className="bg-amber-50 p-1 text-[7px] text-center rounded">MCP</div>
+                                                <div className="bg-amber-50 p-1 text-[7px] text-center rounded">CLI</div>
+                                                <div className="bg-amber-50 p-1 text-[7px] text-center rounded">API</div>
+                                                <div className="bg-amber-50 p-1 text-[7px] text-center rounded">其他</div>
+                                            </div>
                                         </div>
                                     </div>
+                                    <Node id="other-auth" icon={Lock} label="其他资源" customWidth="w-36" colorClass="text-rose-600" bgClass="bg-rose-50" />
                                 </div>
-                                <Node id="vector-db" icon={HardDrive} label="向量数据库" customWidth="w-36" colorClass="text-emerald-600" bgClass="bg-emerald-50" />
-                                <Node id="other-auth" icon={Lock} label="其他资源" customWidth="w-36" colorClass="text-rose-600" bgClass="bg-rose-50" />
+                                <div className="flex shrink-0">
+                                    <Node id="vector-db" icon={HardDrive} label="向量数据库" customWidth="w-40" colorClass="text-emerald-600" bgClass="bg-emerald-50" />
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* ── 连线 ── */}
+                    {/* 1. 用户 → 前端 */}
+                    <Xarrow start="user" end="frontend" color="#94a3b8" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="操作请求" enText="Request" />} headSize={4} />
+
+                    {/* 2. 前端 ↔ 协调 */}
+                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="frontend" color="#06b6d4" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 20 } }} endAnchor={{ position: "right", offset: { y: 20 } }} path="smooth" curveness={0.5} labels={<ConnectionLabel text="结果响应" enText="Response" />} headSize={4} />
+
+                    {/* 3. 协调 ↔ 子智能体 */}
+                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor="bottom" endAnchor="top" dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "top", offset: { x: 45 } }} endAnchor={{ position: "bottom", offset: { x: 45 } }} labels={<ConnectionLabel text="结果聚合" enText="Aggr" />} headSize={4} />
+
+                    {/* 4. 身份核验 */}
+                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" />} headSize={4} />
+                    <Xarrow start="identityServiceContainer" end="iamServiceContainer" color="#6366f1" strokeWidth={2} dashness={true} startAnchor="right" endAnchor="left" labels={<ConnectionLabel text="联邦同步" enText="Federation" />} headSize={4} />
+
+                    {/* 5. 平台资源调用 */}
+                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" />} headSize={4} />
+
+                    {/* 6. Gateway & 外部链路 */}
+                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" />} headSize={4} />
+                    <Xarrow start="gateway" end="oauth-provider" color="#7c3aed" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" dashness={true} headSize={4} />
+                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
+                    <Xarrow start="gateway" end="external" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
+                    <Xarrow start="gateway" end="other-auth" color="#e11d48" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" headSize={4} />
+                    <Xarrow
+                        start="knowledge-base"
+                        end="vector-db"
+                        color="#10b981"
+                        strokeWidth={1.5}
+                        startAnchor="right"
+                        endAnchor="right"
+                        path="grid"
+                        gridBreak="100%"
+                        headSize={4}
+                    />
                 </div>
-
-                {/* ── 连线 ── */}
-                {/* 1. 用户 → 前端 */}
-                <Xarrow start="user" end="frontend" color="#94a3b8" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="操作请求" enText="Request" />} headSize={4} />
-
-                {/* 2. 前端 ↔ 协调 */}
-                <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" />} headSize={4} />
-                <Xarrow start="orchestrator" end="frontend" color="#06b6d4" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 20 } }} endAnchor={{ position: "right", offset: { y: 20 } }} path="smooth" curveness={0.5} labels={<ConnectionLabel text="结果响应" enText="Response" />} headSize={4} />
-
-                {/* 3. 协调 ↔ 子智能体 */}
-                <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -25 } }} endAnchor={{ position: "top", offset: { x: -25 } }} dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" />} headSize={4} />
-                <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "top", offset: { x: 25 } }} endAnchor={{ position: "bottom", offset: { x: 25 } }} labels={<ConnectionLabel text="结果聚合" enText="Aggr" />} headSize={4} />
-
-                {/* 4. 身份核验 */}
-                <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" />} headSize={4} />
-                <Xarrow start="identityServiceContainer" end="iamServiceContainer" color="#6366f1" strokeWidth={2} dashness={true} startAnchor="right" endAnchor="left" labels={<ConnectionLabel text="联邦同步" enText="Federation" />} headSize={4} />
-
-                {/* 5. 平台资源调用 */}
-                <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" />} headSize={4} />
-                <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" />} headSize={4} />
-                <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" />} headSize={4} />
-                <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" />} headSize={4} />
-
-                {/* 6. Gateway & 外部链路 */}
-                <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" />} headSize={4} />
-                <Xarrow start="gateway" end="oauth-provider" color="#7c3aed" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" dashness={true} headSize={4} />
-                <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
-                <Xarrow start="gateway" end="external" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
-                <Xarrow start="gateway" end="other-auth" color="#e11d48" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" headSize={4} />
-                <Xarrow start="knowledge-base" end="vector-db" color="#10b981" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" headSize={4} />
             </Xwrapper>
         </div>
     );
