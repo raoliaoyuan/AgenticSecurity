@@ -11,6 +11,7 @@ import {
     AlertTriangle,
     Zap
 } from 'lucide-react';
+import IdentityAuthView from './IdentityAuthView';
 
 const IdentityLearningView = memo(() => {
     const conceptCards = [
@@ -88,6 +89,9 @@ const IdentityLearningView = memo(() => {
                     </p>
                 </div>
             </div>
+
+            {/* 架构关系视图 */}
+            <IdentityAuthView />
 
             {/* 核心板块 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
