@@ -12,7 +12,7 @@
 
 import React, { useState, useMemo, useCallback, memo } from 'react';
 import {
-    Shield, Database, Server, Code2, Layers, CheckCircle2, Skull
+    Shield, Database, Server, Code2, Layers, CheckCircle2, Skull, Fingerprint
 } from 'lucide-react';
 
 // 导入共享数据
@@ -25,6 +25,7 @@ import ProcessView from './views/arch/ProcessView';
 import DevelopmentView from './views/arch/DevelopmentView';
 import DataView from './views/arch/DataView';
 import PhysicalView from './views/arch/PhysicalView';
+import IdentityLearningView from './views/identity/IdentityLearningView';
 
 // =====================================================================
 // 主组件
@@ -45,6 +46,7 @@ const ArchitectureViz = () => {
     const tabs = useMemo(() => [
         { id: 'logical', label: '逻辑架构', icon: Shield, activeClass: 'bg-blue-600 text-white shadow-lg shadow-blue-200' },
         { id: 'process', label: '运行架构', icon: Layers, activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-200' },
+        { id: 'identity', label: 'Agentic 身份', icon: Fingerprint, activeClass: 'bg-blue-700 text-white shadow-lg shadow-blue-300' },
         { id: 'development', label: '开发架构', icon: Code2, activeClass: 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' },
         { id: 'data', label: '数据架构', icon: Database, activeClass: 'bg-cyan-600 text-white shadow-lg shadow-cyan-200' },
         { id: 'physical', label: '物理架构', icon: Server, activeClass: 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' }
@@ -88,27 +90,29 @@ const ArchitectureViz = () => {
                 </div>
 
                 {/* 视图内容区域 */}
-                {activeTab === 'logical' && (
-                    <LogicalView
-                        activeStep={activeStep}
-                        setActiveStep={setActiveStep}
-                        showThreats={showThreats}
-                    />
-                )}
-                {activeTab === 'process' && <ProcessView />}
-                {activeTab === 'development' && <DevelopmentView />}
-                {activeTab === 'data' && <DataView />}
-                {activeTab === 'physical' && <PhysicalView />}
+                <div className="min-h-[60vh]">
+                    {activeTab === 'logical' && (
+                        <LogicalView
+                            activeStep={activeStep}
+                            setActiveStep={setActiveStep}
+                            showThreats={showThreats}
+                        />
+                    )}
+                    {activeTab === 'process' && <ProcessView />}
+                    {activeTab === 'identity' && <IdentityLearningView />}
+                    {activeTab === 'development' && <DevelopmentView />}
+                    {activeTab === 'data' && <DataView />}
+                    {activeTab === 'physical' && <PhysicalView />}
+                </div>
 
                 {/* 威胁模型摘要 */}
-                {showThreats && (
+                {showThreats && activeTab !== 'identity' && (
                     <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
                         {threatSections.map(section => (
                             <ThreatSection key={section.title} section={section} />
                         ))}
                     </div>
                 )}
-
 
             </div>
         </div>
