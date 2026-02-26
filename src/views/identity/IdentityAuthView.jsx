@@ -154,10 +154,16 @@ const IdentityAuthView = memo(() => {
 
                             {/* 下层：智能体集群与内部后端 */}
                             <div className="flex gap-24 w-full justify-center">
-                                {/* 智能体集群 */}
-                                <div className="flex flex-col gap-24">
-                                    <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" subLabel="任务编排" colorClass="text-indigo-600" bgClass="bg-indigo-50" hasSdk={true} />
-                                    <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" subLabel="原子化执行" colorClass="text-emerald-600" bgClass="bg-emerald-50" hasSdk={true} />
+                                {/* 智能体集群 (Agent Runtime / VPC) */}
+                                <div className="flex flex-col items-center border-2 border-dashed border-indigo-200 bg-indigo-50/40 rounded-3xl p-6 relative">
+                                    <div className="absolute -top-3.5 bg-indigo-100 px-4 py-1 rounded-full text-[9px] font-black uppercase text-indigo-700 border border-indigo-200 shadow-sm flex items-center gap-1.5">
+                                        <Server size={12} className="text-indigo-500" />
+                                        <span>Agent Runtime / VPC</span>
+                                    </div>
+                                    <div className="flex flex-col gap-24 mt-4 w-full items-center">
+                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" subLabel="任务编排" colorClass="text-indigo-600" bgClass="bg-indigo-50" hasSdk={true} />
+                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" subLabel="原子化执行" colorClass="text-emerald-600" bgClass="bg-emerald-50" hasSdk={true} />
+                                    </div>
                                 </div>
 
                                 {/* 云平台内部后端资源 */}
