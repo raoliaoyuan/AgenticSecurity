@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect } from 'react';
 import { useWindowSize } from 'react-use';
-import Xarrow, { Xwrapper } from 'react-xarrows';
+import Xarrow, { Xwrapper, useXarrow } from 'react-xarrows';
 import {
     User,
     Cpu,
@@ -40,64 +40,82 @@ const IdentityAuthView = memo(() => {
 
     // Force re-render of arrows when auth view toggles or window resizes because node sizes change
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setRenderTick(prev => prev + 1);
-        }, 50); // Small delay to allow DOM to update first
-        return () => clearTimeout(timer);
+        // Pulse multiple times to ensure layout is settled
+        const timers = [
+            setTimeout(() => setRenderTick(prev => prev + 1), 0),
+            setTimeout(() => setRenderTick(prev => prev + 1), 50),
+            setTimeout(() => setRenderTick(prev => prev + 1), 150),
+            setTimeout(() => setRenderTick(prev => prev + 1), 300)
+        ];
+        return () => timers.forEach(clearTimeout);
     }, [showAuthView, width, height]);
 
-    const baseBoxStyle = "relative bg-white border-2 border-slate-100 shadow-sm z-10 transition-all hover:border-blue-200 hover:shadow-md";
-    const boxStyle = `${baseBoxStyle} flex flex-col items-center justify-center p-4 rounded-[28px]`;
+    const baseBoxStyle = "relative bg-white border-2 border-slate-100 shadow-sm z-10 transition-[border-color,box-shadow,transform] duration-300 hover:border-blue-200 hover:shadow-md";
+    const boxStyle = `${baseBoxStyle} flex flex-col items-center justify-center pt-2 pb-4 px-4 rounded-[28px]`;
     const rowBoxStyle = `${baseBoxStyle} flex flex-row items-center justify-start py-2 px-3 gap-3 rounded-[16px] h-14`;
     const labelStyle = "text-[13px] font-black text-slate-800 text-center leading-tight";
     const enLabelStyle = "text-[9px] text-slate-400 uppercase tracking-tighter font-bold mt-0.5 text-center";
     const subLabelStyle = "text-[9px] text-blue-500/70 font-bold mt-1.5 text-center bg-blue-50/50 px-2 py-0.5 rounded-full";
 
-    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk, isRow = false, showAuthView, idpName }) => (
-        <div id={id} className={`${isRow ? rowBoxStyle : boxStyle} ${customWidth ? customWidth : (isRow ? 'w-full' : 'w-48')} relative`}>
-            {showAuthView && idpName && (
-                <div className={`absolute ${isRow ? '-top-2 -left-2' : '-top-3 -left-3'} bg-orange-500 text-white px-2 py-0.5 rounded-lg text-[8px] font-black shadow-md z-30 flex items-center gap-1`}>
-                    <ShieldCheck size={10} />
-                    {idpName}
-                </div>
-            )}
-            {hasSdk && (
-                <div className={`absolute ${isRow ? '-top-1.5 -right-1.5 px-1.5 py-0.5' : '-top-3 -right-3 px-2 py-1'} bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-teal-500/25 ring-2 ring-white z-20`}>
-                    <Layers size={isRow ? 8 : 10} className="text-teal-100" />
-                    <span className={`${isRow ? 'text-[7px]' : 'text-[8px]'} font-black tracking-tighter`}>AGENT SDK</span>
-                </div>
-            )}
-            {hasIamSdk && (
-                <div className={`absolute ${isRow ? '-bottom-1.5 -right-1.5 px-1.5 py-0.5' : '-bottom-3 -right-3 px-2 py-1'} bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-indigo-500/25 ring-2 ring-white z-20`}>
-                    <Key size={isRow ? 8 : 10} className="text-indigo-100" />
-                    <span className={`${isRow ? 'text-[7px]' : 'text-[8px]'} font-black tracking-tighter`}>IAM SDK</span>
-                </div>
-            )}
-            <div className={`${isRow ? 'p-1.5 rounded-xl' : 'p-3 rounded-2xl mt-3'} ${bgClass} ${colorClass} shrink-0`}>
-                <Icon size={isRow ? 18 : 24} />
-            </div>
-            <div className={`flex flex-col ${isRow ? 'items-start justify-center' : 'items-center'} min-w-0`}>
-                <span className={`${labelStyle} ${isRow ? 'mt-0 text-[12px]' : 'mt-3 text-[13px]'}`}>{label}</span>
-                <span className={`${enLabelStyle} ${isRow ? 'text-left mt-0 text-[8px]' : 'text-center'}`}>{enLabel}</span>
-                {subLabel && <span className={`${subLabelStyle} ${isRow ? 'mt-0.5' : 'mt-1.5'}`}>{subLabel}</span>}
-            </div>
-        </div>
-    );
+    const Node = ({ id, icon: Icon, label, enLabel, subLabel, colorClass = "text-slate-600", bgClass = "bg-slate-50", customWidth, hasSdk, hasIamSdk, isRow = false, showAuthView, idpName }) => {
+        const updateXarrow = useXarrow();
+        useEffect(() => {
+            updateXarrow();
+        }, [showAuthView, updateXarrow]);
 
-    const ConnectionLabel = ({ text, enText, color = "text-blue-600", borderColor = "border-blue-100", seq, authMethod, showAuthView }) => (
-        <div className={`bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border ${showAuthView && authMethod ? 'border-orange-300' : borderColor} shadow-sm flex flex-col items-center relative`}>
-            {showAuthView && seq && (
-                <div className="absolute -top-2 -left-2 w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-[9px] font-black shadow-md z-10">
-                    {seq}
+        return (
+            <div id={id} className={`${isRow ? rowBoxStyle : boxStyle} ${customWidth ? customWidth : (isRow ? 'w-full' : 'w-48')} relative`}>
+                {showAuthView && idpName && (
+                    <div className={`absolute ${isRow ? '-top-2 -left-2' : '-top-3 -left-3'} bg-orange-500 text-white px-2 py-0.5 rounded-lg text-[8px] font-black shadow-md z-30 flex items-center gap-1`}>
+                        <ShieldCheck size={10} />
+                        {idpName}
+                    </div>
+                )}
+                {hasSdk && (
+                    <div className={`absolute ${isRow ? '-top-1.5 -right-1.5 px-1.5 py-0.5' : '-top-3 -right-3 px-2 py-1'} bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-teal-500/25 ring-2 ring-white z-20`}>
+                        <Layers size={isRow ? 8 : 10} className="text-teal-100" />
+                        <span className={`${isRow ? 'text-[7px]' : 'text-[8px]'} font-black tracking-tighter`}>AGENT SDK</span>
+                    </div>
+                )}
+                {hasIamSdk && (
+                    <div className={`absolute ${isRow ? '-bottom-1.5 -right-1.5 px-1.5 py-0.5' : '-bottom-3 -right-3 px-2 py-1'} bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-lg flex items-center gap-1 shadow-md shadow-indigo-500/25 ring-2 ring-white z-20`}>
+                        <Key size={isRow ? 8 : 10} className="text-indigo-100" />
+                        <span className={`${isRow ? 'text-[7px]' : 'text-[8px]'} font-black tracking-tighter`}>IAM SDK</span>
+                    </div>
+                )}
+                <div className={`${isRow ? 'p-1.5 rounded-xl' : 'p-2 rounded-2xl mt-1'} ${bgClass} ${colorClass} shrink-0`}>
+                    <Icon size={isRow ? 18 : 24} />
                 </div>
-            )}
-            <span className={`text-[9px] font-black leading-none ${showAuthView && authMethod ? 'text-orange-600' : color}`}>{text}</span>
-            <span className="text-[7px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{enText}</span>
-            {showAuthView && authMethod && (
-                <span className="text-[7px] bg-orange-100 text-orange-700 px-1 py-0.5 rounded mt-0.5 font-bold">{authMethod}</span>
-            )}
-        </div>
-    );
+                <div className={`flex flex-col ${isRow ? 'items-start justify-center' : 'items-center'} min-w-0`}>
+                    <span className={`${labelStyle} ${isRow ? 'mt-0 text-[12px]' : 'mt-1.5 text-[13px]'}`}>{label}</span>
+                    <span className={`${enLabelStyle} ${isRow ? 'text-left mt-0 text-[8px]' : 'text-center'}`}>{enLabel}</span>
+                    {subLabel && <span className={`${subLabelStyle} ${isRow ? 'mt-0.5' : 'mt-1.5'}`}>{subLabel}</span>}
+                </div>
+            </div>
+        );
+    };
+
+    const ConnectionLabel = ({ text, enText, color = "text-blue-600", borderColor = "border-blue-100", seq, authMethod, showAuthView }) => {
+        const updateXarrow = useXarrow();
+        useEffect(() => {
+            updateXarrow();
+        }, [showAuthView, updateXarrow]);
+
+        return (
+            <div className={`bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border ${showAuthView && authMethod ? 'border-orange-300' : borderColor} shadow-sm flex flex-col items-center relative`}>
+                {showAuthView && seq && (
+                    <div className="absolute -top-2 -left-2 w-4 h-4 bg-orange-500 text-white rounded-full flex items-center justify-center text-[9px] font-black shadow-md z-10">
+                        {seq}
+                    </div>
+                )}
+                <span className={`text-[9px] font-black leading-none ${showAuthView && authMethod ? 'text-orange-600' : color}`}>{text}</span>
+                <span className="text-[7px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">{enText}</span>
+                {showAuthView && authMethod && (
+                    <span className="text-[7px] bg-orange-100 text-orange-700 px-1 py-0.5 rounded mt-0.5 font-bold">{authMethod}</span>
+                )}
+            </div>
+        );
+    };
 
     const FeatureBox = ({ icon: Icon, title, enTitle, activeColor = "text-teal-300" }) => (
         <div className="bg-slate-800/80 p-3 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors flex flex-col gap-1 items-start group">
@@ -106,6 +124,16 @@ const IdentityAuthView = memo(() => {
                 <span className="text-[10px] font-black text-white">{title}</span>
             </div>
             <span className="text-[8px] text-slate-500 font-bold uppercase tracking-tighter ml-5 group-hover:text-slate-400 transition-colors">{enTitle}</span>
+        </div>
+    );
+
+    const RuntimeContainer = ({ children }) => (
+        <div className="p-1.5 bg-indigo-50/50 rounded-[36px] border border-indigo-200/50 shadow-inner flex flex-col items-center relative group overflow-visible">
+            <div className="absolute -bottom-2.5 right-6 flex items-center gap-1.5 opacity-40 group-hover:opacity-80 transition-opacity bg-white/80 px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
+                <Terminal size={10} className="text-indigo-600" />
+                <span className="text-[8px] font-black text-indigo-700 uppercase tracking-widest">Runtime Instance</span>
+            </div>
+            {children}
         </div>
     );
 
@@ -213,17 +241,21 @@ const IdentityAuthView = memo(() => {
                             </div>
 
                             {/* 第二行：Agent Runtime + 后端资源 */}
-                            <div className="flex gap-6 items-start">
-                                <div id="agentRuntime" className="flex-1 flex flex-col items-center justify-center gap-16 border-2 border-dashed border-indigo-200 bg-indigo-50/40 rounded-3xl p-8 pt-12 pb-12 relative min-h-[380px]">
+                            <div className="flex gap-6 items-stretch">
+                                <div id="agentRuntime" className="flex-1 flex flex-col items-center justify-between gap-16 border-2 border-dashed border-indigo-200 bg-indigo-50/10 rounded-3xl p-8 pt-12 pb-12 relative min-h-[440px]">
                                     <div className="absolute -top-3.5 bg-indigo-100 px-4 py-1 rounded-full text-[9px] font-black uppercase text-indigo-700 border border-indigo-200 shadow-sm flex items-center gap-1.5">
                                         <Server size={12} className="text-indigo-500" />
-                                        <span>Agent Runtime / VPC</span>
+                                        <span>Cluster / Virtual Private Cloud</span>
                                     </div>
-                                    <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
-                                    <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
+                                    <RuntimeContainer>
+                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
+                                    </RuntimeContainer>
+                                    <RuntimeContainer>
+                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
+                                    </RuntimeContainer>
                                 </div>
 
-                                <div className="w-[240px] shrink-0 pt-[38px] pb-6 flex flex-col gap-4">
+                                <div className="w-[240px] shrink-0 pt-12 pb-12 flex flex-col justify-between">
                                     <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" hasIamSdk={true} colorClass="text-purple-600" bgClass="bg-purple-50" isRow={true} />
                                     <Node id="memory" icon={Brain} label="记忆服务" enLabel="Memory Service" hasIamSdk={true} colorClass="text-pink-600" bgClass="bg-pink-50" isRow={true} />
                                     <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" hasIamSdk={true} colorClass="text-sky-600" bgClass="bg-sky-50" isRow={true} />
@@ -289,38 +321,36 @@ const IdentityAuthView = memo(() => {
                     <Xarrow start="user" end="frontend" color="#94a3b8" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="操作请求" enText="Request" showAuthView={showAuthView} seq={1} authMethod="Session / JWT" />} headSize={4} />
 
                     {/* 2. 前端 ↔ 协调 */}
-                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor="right" endAnchor="left" path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" showAuthView={showAuthView} seq={2} authMethod="Token Exchange" />} headSize={4} />
+                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor={{ position: "left", offset: { y: -20 } }} path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" showAuthView={showAuthView} seq={2} authMethod="Token Exchange" />} headSize={4} />
                     <Xarrow start="orchestrator" end="frontend" color="#06b6d4" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 20 } }} endAnchor={{ position: "right", offset: { y: 20 } }} path="smooth" curveness={0.5} labels={<ConnectionLabel text="结果响应" enText="Response" />} headSize={4} />
 
                     {/* 3. 协调 ↔ 子智能体 */}
-                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor="bottom" endAnchor="top" dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" showAuthView={showAuthView} seq={5} authMethod="mTLS / Agent Token" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -45 } }} endAnchor={{ position: "top", offset: { x: -45 } }} dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" showAuthView={showAuthView} seq={5} authMethod="mTLS / Agent Token" />} headSize={4} />
                     <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "top", offset: { x: 45 } }} endAnchor={{ position: "bottom", offset: { x: 45 } }} labels={<ConnectionLabel text="结果聚合" enText="Aggr" />} headSize={4} />
 
                     {/* 4. 身份核验 */}
-                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" showAuthView={showAuthView} seq={3} authMethod="SPIFFE ID / JWT" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" showAuthView={showAuthView} seq={3} authMethod="SPIFFE ID / JWT" />} headSize={4} labelPos={0.25} />
                     <Xarrow start="identityServiceContainer" end="iamServiceContainer" color="#6366f1" strokeWidth={2} dashness={true} startAnchor="right" endAnchor="left" labels={<ConnectionLabel text="联邦同步" enText="Federation" showAuthView={showAuthView} seq={4} authMethod="Token Federation" />} headSize={4} />
 
                     {/* 5. 平台资源调用 */}
-                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" showAuthView={showAuthView} seq={6} authMethod="IAM Role" />} headSize={4} />
-                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
-                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
-                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor="right" endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" showAuthView={showAuthView} seq={6} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor={{ position: "right", offset: { y: 20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor={{ position: "right", offset: { y: 20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
 
                     {/* 6. Gateway & 外部链路 */}
-                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" showAuthView={showAuthView} seq={7} authMethod="Agent Token" />} headSize={4} />
-                    <Xarrow start="gateway" end="oauth-provider" color="#7c3aed" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" dashness={true} headSize={4} />
-                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="访问应用" enText="Access" showAuthView={showAuthView} seq={8} authMethod="OAuth / API Key" />} headSize={4} />
-                    <Xarrow start="gateway" end="external" color="#f59e0b" strokeWidth={2} startAnchor="bottom" endAnchor="top" headSize={4} />
-                    <Xarrow start="gateway" end="other-auth" color="#e11d48" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" headSize={4} />
+                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -30 } }} endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" showAuthView={showAuthView} seq={7} authMethod="Agent Token" />} headSize={4} />
+                    <Xarrow start="gateway" end="oauth-provider" color="#7c3aed" strokeWidth={1.5} startAnchor={{ position: "bottom", offset: { x: -140 } }} endAnchor="top" dashness={true} headSize={4} />
+                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -40 } }} endAnchor="top" labels={<ConnectionLabel text="访问应用" enText="Access" showAuthView={showAuthView} seq={8} authMethod="OAuth / API Key" />} headSize={4} />
+                    <Xarrow start="gateway" end="external" color="#f59e0b" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: 60 } }} endAnchor="top" headSize={4} />
+                    <Xarrow start="gateway" end="other-auth" color="#e11d48" strokeWidth={1.5} startAnchor={{ position: "bottom", offset: { x: 160 } }} endAnchor="top" headSize={4} />
                     <Xarrow
                         start="knowledge-base"
                         end="vector-db"
                         color="#10b981"
                         strokeWidth={1.5}
-                        startAnchor="right"
-                        endAnchor="right"
-                        path="grid"
-                        gridBreak="100%"
+                        startAnchor="bottom"
+                        endAnchor="top"
                         headSize={4}
                     />
                 </div>
