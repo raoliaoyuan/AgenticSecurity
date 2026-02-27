@@ -16,8 +16,7 @@ import {
 } from 'lucide-react';
 
 // 导入共享数据
-import { defenseItems, getThreatSections } from './views/arch/data/archData.jsx';
-import { ThreatSection } from './views/arch/components/CommonComponents';
+import { defenseItems } from './views/arch/data/archData.jsx';
 
 // 导入各个视图组件
 import LogicalView from './views/arch/LogicalView';
@@ -32,15 +31,12 @@ import IdentityLearningView from './views/identity/IdentityLearningView';
 // =====================================================================
 const ArchitectureViz = () => {
     const [activeStep, setActiveStep] = useState(null);
-    const [showThreats, setShowThreats] = useState(true);
     const [activeTab, setActiveTab] = useState('logical');
 
-    // 缓存威胁模型摘要数据
-    const threatSections = useMemo(() => getThreatSections(), []);
+
 
     // 缓存按钮点击处理
     const handleTabChange = useCallback((tab) => setActiveTab(tab), []);
-    const handleToggleThreats = useCallback(() => setShowThreats(prev => !prev), []);
 
     // Tab 配置
     const tabs = useMemo(() => [
@@ -95,7 +91,6 @@ const ArchitectureViz = () => {
                         <LogicalView
                             activeStep={activeStep}
                             setActiveStep={setActiveStep}
-                            showThreats={showThreats}
                         />
                     )}
                     {activeTab === 'process' && <ProcessView />}
@@ -105,14 +100,7 @@ const ArchitectureViz = () => {
                     {activeTab === 'physical' && <PhysicalView />}
                 </div>
 
-                {/* 威胁模型摘要 */}
-                {showThreats && activeTab !== 'identity' && (
-                    <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {threatSections.map(section => (
-                            <ThreatSection key={section.title} section={section} />
-                        ))}
-                    </div>
-                )}
+
 
             </div>
         </div>

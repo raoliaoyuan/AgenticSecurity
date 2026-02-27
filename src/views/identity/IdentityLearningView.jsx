@@ -73,22 +73,6 @@ const IdentityLearningView = memo(() => {
 
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* 顶标题 */}
-            <div className="relative overflow-hidden bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-                <div className="absolute top-0 right-0 p-12 opacity-5">
-                    <Fingerprint size={200} />
-                </div>
-                <div className="relative z-10 max-w-2xl">
-                    <h2 className="text-4xl font-black text-slate-900 mb-4 flex items-center gap-3">
-                        <Fingerprint className="text-blue-600 w-10 h-10" />
-                        Agentic Identity <span className="text-blue-600 font-extrabold">核心研究</span>
-                    </h2>
-                    <p className="text-slate-600 text-lg leading-relaxed">
-                        在 AI 时代，"身份" 的边界正在重构。Agentic Identity 是连接自主 Agent 与安全契约的桥梁，
-                        确保每一个自主决策都发生在一个可控、可验证的信任框架之内。
-                    </p>
-                </div>
-            </div>
 
             {/* 架构关系视图 */}
             <IdentityAuthView />

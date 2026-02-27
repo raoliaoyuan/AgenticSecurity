@@ -128,47 +128,6 @@ export const layers = [
     }
 ];
 
-// =====================================================================
-// 威胁模型列表
-// =====================================================================
-export const threatLists = {
-    llm: [
-        { id: 'LLM01:2025', name: 'Prompt Injection', desc: '提示词注入 (直接、间接或通过 RAG 资源)' },
-        { id: 'LLM02:2025', name: 'Sensitive Info Disclosure', desc: '不当暴露 PII、凭据或系统指令' },
-        { id: 'LLM03:2025', name: 'Supply Chain Risks', desc: '训练集、基础模型或工具库供应链投毒' },
-        { id: 'LLM04:2025', name: 'Data & Model Poisoning', desc: '操作训练、微调或嵌入数据以改变行为' },
-        { id: 'LLM05:2025', name: 'Improper Output Handling', desc: '输出导致 SSRF、XSS 或指令劫持' },
-        { id: 'LLM06:2025', name: 'Excessive Agency', desc: '赋予模型过多的工具权限、自主权或信任度' },
-        { id: 'LLM07:2025', name: 'System Prompt Leakage', desc: '泄露系统初始指令' },
-        { id: 'LLM08:2025', name: 'Vector Weaknesses', desc: '针对 RAG 向量存储的攻击' },
-        { id: 'LLM09:2025', name: 'Misinformation', desc: '产生误导、虚假且具有说服力的内容' },
-        { id: 'LLM10:2025', name: 'Unbounded Consumption', desc: '恶意请求导致配额耗尽' }
-    ],
-    agentic: [
-        { id: 'ASI01', name: 'Agent Goal Hijack', desc: '篡改智能体任务清单或偏离设计初衷' },
-        { id: 'ASI02', name: 'Tool Misuse', desc: '对工具参数缺乏校验导致的滥用' },
-        { id: 'ASI03', name: 'Identity Abuse', desc: '身份继承漏洞或跨代理级别的权限提升' },
-        { id: 'ASI04', name: 'Agentic Supply Chain', desc: '恶意第三方智能体或 Persona' },
-        { id: 'ASI05', name: 'Unexpected Execution', desc: '自主执行未经审计的脚本' },
-        { id: 'ASI06', name: 'Memory Poisoning', desc: '在长期记忆或上下文中注入恶意知识' },
-        { id: 'ASI07', name: 'Insecure Comm', desc: '协作中的消息篡改、劫持或伪造' },
-        { id: 'ASI08', name: 'Cascading Failures', desc: '单个节点受控引发整体瘫痪' },
-        { id: 'ASI09', name: 'Trust Exploit', desc: '利用用户对智能体的信赖诱导危险授权' },
-        { id: 'ASI10', name: 'Rogue Agents', desc: '违反安全约束的行为' }
-    ],
-    mcp: [
-        { id: 'MCP01', name: 'Indirect Injection', desc: '通过恶意 MCP 资源内容注入指令' },
-        { id: 'MCP02', name: 'Tool Poisoning', desc: '工具定义被篡改以引入恶意逻辑' },
-        { id: 'MCP03', name: 'Excessive Permissions', desc: '服务器权限分配过大且缺乏 RBAC' },
-        { id: 'MCP04', name: 'Credential Theft', desc: 'API Token 在协议传输中泄露' },
-        { id: 'MCP05', name: 'Tool Shadowing', desc: '恶意服务器拦截合规调用' },
-        { id: 'MCP06', name: 'Injection', desc: '接口缺乏对输入参数的清理' },
-        { id: 'MCP07', name: 'Rug Pull Attacks', desc: '信任工具在更新后改变行为' },
-        { id: 'MCP08', name: 'Broken Auth', desc: '服务器间缺乏相互认证机制' },
-        { id: 'MCP09', name: 'Lack of Audit', desc: '跨协议边界的调用缺乏追踪记录' },
-        { id: 'MCP10', name: 'Integrity Failure', desc: '错误的工具调用参数组合' }
-    ]
-};
 
 // =====================================================================
 // 防御概要
@@ -180,11 +139,3 @@ export const defenseItems = [
     { title: '隔离计算沙箱', desc: '所有非确定性代码均在 Python Sandbox 中运行，严格限制网络与文件访问。' }
 ];
 
-// =====================================================================
-// 威胁模型摘要配置
-// =====================================================================
-export const getThreatSections = () => [
-    { title: 'OWASP LLM 重点防御', color: 'red', list: threatLists.llm, icon: <Skull className="w-6 h-6 text-red-400" /> },
-    { title: 'Agentic 行为审计', color: 'orange', list: threatLists.agentic, icon: <Zap className="w-6 h-6 text-orange-400" /> },
-    { title: 'MCP 通道安全', color: 'amber', list: threatLists.mcp, icon: <Layers className="w-6 h-6 text-amber-400" /> }
-];
