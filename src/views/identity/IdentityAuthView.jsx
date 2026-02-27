@@ -245,27 +245,33 @@ const IdentityAuthView = memo(() => {
                                 <div id="agentRuntime" className="flex-1 flex flex-col items-center justify-between gap-16 border-2 border-dashed border-indigo-200 bg-indigo-50/10 rounded-3xl p-8 pt-12 pb-12 relative min-h-[440px]">
                                     <div className="absolute -top-3.5 bg-indigo-100 px-4 py-1 rounded-full text-[9px] font-black uppercase text-indigo-700 border border-indigo-200 shadow-sm flex items-center gap-1.5">
                                         <Server size={12} className="text-indigo-500" />
-                                        <span>Cluster / Virtual Private Cloud</span>
+                                        <span>Agent Runtime Environment</span>
                                     </div>
                                     <RuntimeContainer>
-                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
+                                        <Node id="orchestrator" icon={Workflow} label="协调智能体" enLabel="Orchestrator Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="执行身份注入" />
                                     </RuntimeContainer>
                                     <RuntimeContainer>
-                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="Workload Identity" />
+                                        <Node id="sub-agent" icon={Cpu} label="子智能体" enLabel="Sub-Agent" hasSdk={true} hasIamSdk={true} customWidth="w-56" showAuthView={showAuthView} idpName="短效任务委派" />
                                     </RuntimeContainer>
                                 </div>
 
                                 <div className="w-[240px] shrink-0 pt-12 pb-12 flex flex-col justify-between">
-                                    <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" hasIamSdk={true} colorClass="text-purple-600" bgClass="bg-purple-50" isRow={true} />
-                                    <Node id="memory" icon={Brain} label="记忆服务" enLabel="Memory Service" hasIamSdk={true} colorClass="text-pink-600" bgClass="bg-pink-50" isRow={true} />
-                                    <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" hasIamSdk={true} colorClass="text-sky-600" bgClass="bg-sky-50" isRow={true} />
-                                    <Node id="knowledge-base" icon={Database} label="知识库" enLabel="Knowledge Base" hasIamSdk={true} colorClass="text-green-600" bgClass="bg-green-50" isRow={true} />
+                                    <Node id="llm" icon={Box} label="基础模型" enLabel="Foundation Model" hasIamSdk={true} colorClass="text-purple-600" bgClass="bg-purple-50" isRow={true} showAuthView={showAuthView} idpName="服务托管身份" />
+                                    <Node id="memory" icon={Brain} label="记忆服务" enLabel="Memory Service" hasIamSdk={true} colorClass="text-pink-600" bgClass="bg-pink-50" isRow={true} showAuthView={showAuthView} idpName="服务托管身份" />
+                                    <Node id="cloud" icon={Cloud} label="云服务" enLabel="Cloud Service" hasIamSdk={true} colorClass="text-sky-600" bgClass="bg-sky-50" isRow={true} showAuthView={showAuthView} idpName="服务托管身份" />
+                                    <Node id="knowledge-base" icon={Database} label="知识库" enLabel="Knowledge Base" hasIamSdk={true} colorClass="text-green-600" bgClass="bg-green-50" isRow={true} showAuthView={showAuthView} idpName="服务托管身份" />
                                 </div>
                             </div>
 
                             {/* 第三行：Agent Gateway */}
                             <div className="mt-6 flex justify-start">
-                                <div id="gateway" className="w-[calc(100%-320px)] px-5 py-4 bg-gradient-to-r from-orange-900 via-amber-900 to-orange-900 rounded-[20px] text-white flex items-center justify-between shadow-lg border-2 border-amber-600/20">
+                                <div id="gateway" className="w-[calc(100%-320px)] px-5 py-4 bg-gradient-to-r from-orange-900 via-amber-900 to-orange-900 rounded-[20px] text-white flex items-center justify-between shadow-lg border-2 border-amber-600/20 relative">
+                                    {showAuthView && (
+                                        <div className="absolute -top-3 -left-3 bg-orange-500 text-white px-2 py-0.5 rounded-lg text-[8px] font-black shadow-md z-30 flex items-center gap-1">
+                                            <ShieldCheck size={10} />
+                                            特权代理身份
+                                        </div>
+                                    )}
                                     <div className="flex items-center gap-3">
                                         <Network className="text-amber-300" size={24} />
                                         <div>
@@ -294,9 +300,15 @@ const IdentityAuthView = memo(() => {
                             <div className="flex gap-4 w-full justify-between items-start flex-nowrap">
                                 <div className="flex gap-4 flex-wrap justify-start items-start">
                                     <Node id="oauth-provider" icon={UserCheck} label="OAuth / IdP" customWidth="w-36" colorClass="text-violet-600" bgClass="bg-violet-50" showAuthView={showAuthView} idpName="外部 SaaS IdP" />
-                                    <Node id="saas-apps" icon={Users} label="SaaS 应用" customWidth="w-36" colorClass="text-blue-600" bgClass="bg-blue-50" />
+                                    <Node id="saas-apps" icon={Users} label="SaaS 应用" customWidth="w-36" colorClass="text-blue-600" bgClass="bg-blue-50" showAuthView={showAuthView} idpName="SaaS 凭证 / API Key" />
                                     <div id="external" className="flex flex-col items-center">
-                                        <div className="flex flex-col items-center p-3 bg-white rounded-2xl border-2 border-amber-100 shadow-lg w-[190px]">
+                                        <div className="flex flex-col items-center p-3 bg-white rounded-2xl border-2 border-amber-100 shadow-lg w-[190px] relative">
+                                            {showAuthView && (
+                                                <div className="absolute -top-3 -left-3 bg-orange-500 text-white px-2 py-0.5 rounded-lg text-[8px] font-black shadow-md z-30 flex items-center gap-1">
+                                                    <ShieldCheck size={10} />
+                                                    外部集成凭证
+                                                </div>
+                                            )}
                                             <ExternalLink className="text-amber-600 mb-2" size={20} />
                                             <span className="text-sm font-black">外部服务</span>
                                             <div className="grid grid-cols-4 gap-1 w-full mt-2">
@@ -307,10 +319,10 @@ const IdentityAuthView = memo(() => {
                                             </div>
                                         </div>
                                     </div>
-                                    <Node id="other-auth" icon={Lock} label="其他资源" customWidth="w-36" colorClass="text-rose-600" bgClass="bg-rose-50" />
+                                    <Node id="other-auth" icon={Lock} label="其他资源" customWidth="w-36" colorClass="text-rose-600" bgClass="bg-rose-50" showAuthView={showAuthView} idpName="自定义凭证" />
                                 </div>
                                 <div className="flex shrink-0">
-                                    <Node id="vector-db" icon={HardDrive} label="向量数据库" customWidth="w-40" colorClass="text-emerald-600" bgClass="bg-emerald-50" />
+                                    <Node id="vector-db" icon={HardDrive} label="向量数据库" customWidth="w-40" colorClass="text-emerald-600" bgClass="bg-emerald-50" showAuthView={showAuthView} idpName="数据库凭证" />
                                 </div>
                             </div>
                         </div>
@@ -321,27 +333,27 @@ const IdentityAuthView = memo(() => {
                     <Xarrow start="user" end="frontend" color="#94a3b8" strokeWidth={1.5} startAnchor="bottom" endAnchor="top" labels={<ConnectionLabel text="操作请求" enText="Request" showAuthView={showAuthView} seq={1} authMethod="Session / JWT" />} headSize={4} />
 
                     {/* 2. 前端 ↔ 协调 */}
-                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor={{ position: "left", offset: { y: -20 } }} path="smooth" labels={<ConnectionLabel text="委派任务" enText="Delegation" showAuthView={showAuthView} seq={2} authMethod="Token Exchange" />} headSize={4} />
+                    <Xarrow start="frontend" end="orchestrator" color="#0891b2" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor={{ position: "left", offset: { y: -20 } }} path="smooth" labels={<ConnectionLabel text="会话承载" enText="Invoking" showAuthView={showAuthView} seq={2} authMethod="Session / Context" />} headSize={4} />
                     <Xarrow start="orchestrator" end="frontend" color="#06b6d4" strokeWidth={1.5} startAnchor={{ position: "left", offset: { y: 20 } }} endAnchor={{ position: "right", offset: { y: 20 } }} path="smooth" curveness={0.5} labels={<ConnectionLabel text="结果响应" enText="Response" />} headSize={4} />
 
                     {/* 3. 协调 ↔ 子智能体 */}
-                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -45 } }} endAnchor={{ position: "top", offset: { x: -45 } }} dashness={true} labels={<ConnectionLabel text="任务分发" enText="Dispatch" showAuthView={showAuthView} seq={5} authMethod="mTLS / Agent Token" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="sub-agent" color="#4f46e5" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -45 } }} endAnchor={{ position: "top", offset: { x: -45 } }} dashness={true} labels={<ConnectionLabel text="任务委派" enText="Delegate" showAuthView={showAuthView} seq={5} authMethod="Task-scoped Token" />} headSize={4} />
                     <Xarrow start="sub-agent" end="orchestrator" color="#10b981" strokeWidth={1.5} startAnchor={{ position: "top", offset: { x: 45 } }} endAnchor={{ position: "bottom", offset: { x: 45 } }} labels={<ConnectionLabel text="结果聚合" enText="Aggr" />} headSize={4} />
 
                     {/* 4. 身份核验 */}
-                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="SDK 核验" enText="Verify" showAuthView={showAuthView} seq={3} authMethod="SPIFFE ID / JWT" />} headSize={4} labelPos={0.25} />
+                    <Xarrow start="orchestrator" end="identityServiceContainer" color="#3b82f6" strokeWidth={2} startAnchor="top" endAnchor="bottom" path="smooth" labels={<ConnectionLabel text="换取执行凭证" enText="Exchange" showAuthView={showAuthView} seq={3} authMethod="Agent Token Issuance" />} headSize={4} labelPos={0.25} />
                     <Xarrow start="identityServiceContainer" end="iamServiceContainer" color="#6366f1" strokeWidth={2} dashness={true} startAnchor="right" endAnchor="left" labels={<ConnectionLabel text="联邦同步" enText="Federation" showAuthView={showAuthView} seq={4} authMethod="Token Federation" />} headSize={4} />
 
                     {/* 5. 平台资源调用 */}
-                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" showAuthView={showAuthView} seq={6} authMethod="IAM Role" />} headSize={4} />
-                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor={{ position: "right", offset: { y: 20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
-                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
-                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor={{ position: "right", offset: { y: 20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" showAuthView={showAuthView} authMethod="IAM Role" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="llm" color="#8b5cf6" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="推理" enText="LLM" showAuthView={showAuthView} seq={6} authMethod="Execution Role" />} headSize={4} />
+                    <Xarrow start="orchestrator" end="memory" color="#ec4899" strokeWidth={2} startAnchor={{ position: "right", offset: { y: 20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="记忆" enText="Memory" showAuthView={showAuthView} authMethod="Execution Role" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="cloud" color="#0ea5e9" strokeWidth={2} startAnchor={{ position: "right", offset: { y: -20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="资源" enText="Access" showAuthView={showAuthView} authMethod="Execution Role" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="knowledge-base" color="#16a34a" strokeWidth={2} startAnchor={{ position: "right", offset: { y: 20 } }} endAnchor="left" dashness={true} labels={<ConnectionLabel text="检索" enText="RAG" showAuthView={showAuthView} authMethod="Execution Role" />} headSize={4} />
 
                     {/* 6. Gateway & 外部链路 */}
-                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -30 } }} endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" showAuthView={showAuthView} seq={7} authMethod="Agent Token" />} headSize={4} />
+                    <Xarrow start="sub-agent" end="gateway" color="#f59e0b" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -30 } }} endAnchor="top" labels={<ConnectionLabel text="工具调用" enText="Tools" showAuthView={showAuthView} seq={7} authMethod="Task Token" />} headSize={4} />
                     <Xarrow start="gateway" end="oauth-provider" color="#7c3aed" strokeWidth={1.5} startAnchor={{ position: "bottom", offset: { x: -140 } }} endAnchor="top" dashness={true} headSize={4} />
-                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -40 } }} endAnchor="top" labels={<ConnectionLabel text="访问应用" enText="Access" showAuthView={showAuthView} seq={8} authMethod="OAuth / API Key" />} headSize={4} />
+                    <Xarrow start="gateway" end="saas-apps" color="#3b82f6" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: -40 } }} endAnchor="top" labels={<ConnectionLabel text="出站访问" enText="Outbound" showAuthView={showAuthView} seq={8} authMethod="Credential Injection" />} headSize={4} />
                     <Xarrow start="gateway" end="external" color="#f59e0b" strokeWidth={2} startAnchor={{ position: "bottom", offset: { x: 60 } }} endAnchor="top" headSize={4} />
                     <Xarrow start="gateway" end="other-auth" color="#e11d48" strokeWidth={1.5} startAnchor={{ position: "bottom", offset: { x: 160 } }} endAnchor="top" headSize={4} />
                     <Xarrow
