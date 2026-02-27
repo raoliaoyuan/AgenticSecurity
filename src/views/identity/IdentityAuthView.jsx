@@ -30,11 +30,18 @@ import {
     Network,
     HardDrive,
     Users,
-    UserCheck
+    UserCheck,
+    FileText,
+    Download,
+    ChevronDown,
+    ChevronUp
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const IdentityAuthView = memo(() => {
     const [showAuthView, setShowAuthView] = useState(false);
+    const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
     const [renderTick, setRenderTick] = useState(0);
     const { width, height } = useWindowSize(); // Listen to window resize to fix offset lines
 
@@ -137,6 +144,127 @@ const IdentityAuthView = memo(() => {
         </div>
     );
 
+    const generateMarkdown = () => {
+        return `# **Agent 身份认证与授权架构设计文档**
+
+## **1. 简介 (Introduction)**
+
+### **1.1 目的**
+随着多智能体系统 (Agentic AI) 逐渐承担更复杂的自主决策任务，建立严密的身份与权限边界至关重要。本文档定义了一套无厂商锁定的通用 Agent 身份认证与授权架构体系，确立了“身份即基石”的核心原则，实现从终端用户到各级子智能体的全链路身份管控与细粒度隔离。
+
+### **1.2 核心安全原则**
+*   **非人类身份主体 (Workload Identity)**：将每一个 Agent 实例视作独立的工作负载实体，赋予短期、可验证的唯一身份标识。
+*   **最小权限与策略驱动 (Least Privilege & Policy-driven)**：依托集中化的策略控制引擎，针对具体任务按需动态收缩 Agent 的可执行操作域。
+*   **凭证托管隔离 (Decoupled Credentials)**：Agent 运行时环境杜绝直接触碰高价值明文密钥，全程依赖平台的身份置换机制代理访问。
+
+---
+
+## **2. 架构层级与核心组件 (Architecture & Core Components)**
+
+### **2.1 智能体身份控制面 (Agent Identity Control Plane)**
+作为防御体系的大脑，提供涵盖整个身份生命周期的核心支持能力：
+*   **智能体身份服务 (Agent Identity Service)**：负责统一管理所有 Agent 实例的注册与身份生命周期，提供标准化、可验证的实体身份，是信任链条的基石。
+*   **策略管理 (Policy Management)**：统一定义和下发原子级访问控制策略，支持依据最小权限原则设定每一类 Agent 能调用的工具接口、存储范围及允许发起的网络请求。
+*   **凭证管理 (Credential Management)**：安全隔离的凭证托管保险库 (Vault) 中心，负责集中加密存储各类云原生临时角色及第三方 SaaS 集成的 API 密钥、OAuth 访问令牌。
+*   **身份解析 (Identity Analyzer)**：负责深度提取和剖析交互请求（如 JWT 或内部上下文 Token）中携带的信息，校验请求凭证合法性，防御伪造和重放攻击。
+
+### **2.2 运行环境与网关 (Runtime & Gateway)**
+*   **协调智能体 (Orchestrator Agent)** 与 **子智能体 (Sub-Agent)** 位于独立的沙箱运行环境中，分别承担全局路由分发与专注特定职能子任务的角色，彼此物理和逻辑双重隔离。
+*   **网关代理 (Agent Gateway)**：接管一切外部工具的调用。拦截系统内外的数据交互请求，实现身份凭证检查与协议转换。
+
+---
+
+## **3. 核心认证与授权机制 (Core Auth & AuthZ Mechanisms)**
+
+### **3.1 智能体身份获取与认证 (Identity Acquisition & Authentication)**
+*   **动态身份获取**：在启动或接受任务派发时，Agent 需要从智能体身份服务获取身份。此过程依赖提交底层计算资源的加密声明（例如容器或无服务器架构的基础设施标识），动态置换出一把标准化的短效任务令牌 (Task-scoped Token)。
+*   **双向验证**：系统内部 Agent-to-Agent (A2A) 通信严格施行基于内网签发的独立凭证协议（如双向 TLS 或受控范围 JWT），抛弃静态密钥及长效配置，确保高频轮换条件下的通信安全。
+
+### **3.2 Agent 授权模式 (Authorization)**
+*   **策略引擎鉴权**：在执行任何资源拉取或行为调用前，调用均经过策略管理中心进行拦截匹配，实时判断 Agent 是否拥有对应执行权限。
+*   **基础设施联邦**：利用身份映射机制（Identity Federation），直接将上层的 Agent 身份映射至底层的计算访问策略 (如利用临时安全令牌访问内部模型接口及高速大容量存储)，确保所有数据调用权限收口一致。
+
+### **3.3 凭证获取与托管方式 (Credential Loading & Hosting)**
+*   **隐式代理注入**：Agent 代码运行时本身不持有或申请外部工具密钥。
+*   **网关置换出站**：当需要联动第三方服务（如外部 API 等）时，业务逻辑层仅出示本身的上下文 JWT，后由凭证管理中心验证权限无误后，无缝将其替换或隐式注入实际的第三方 API Header 中随请求出站，实现最严防的数据防泄漏与凭证隔离托管。
+
+---
+
+## **4. 架构组件与认证协议深度分析 (Categorized Analysis)**
+
+为了更好地在不同场景下应用安全控制，以下按组件角色和网络边界，对架构内涉及的多种类型的组件及所使用的认证协议进行分类与场景剖析。
+
+### **4.1 架构组件类型分类 (Component Categories)**
+
+依据组件所处的安全边界域和管理归属，我们可以将整个 AI 架构环境下的组件横向划分为三类：
+
+| 组件分类 | 典型实体范例 | 核心特征与场景描述 | 身份持有类型 |
+| :--- | :--- | :--- | :--- |
+| **原生核心组件 (Core Infrastructure)** | 身份服务 (Identity Service), 策略控制面 (Policy Mgmt), 凭证保险库 (Vault) |  属于平台底座的最高特权级别“Tier-0”级核心服务，运行于严密隔离的管理网络中。负责统筹定义架构规则。 | 平台顶级治理身份，不可被普通业务或 Agent 覆盖。 |
+| **内部智能体与运行时组件 (Internal Workloads)** | 协调智能体 (Orchestrator Agent), 子智能体 (Sub-Agent), 记忆与知识库端点 | 业务层面的实际计算载体。生命周期随任务动态生成与销毁。其运行环境可被基础设施强纳管。 | **短效工作负载身份 (Short-lived Workload Identity)**，如 Task-Scoped JWT。 |
+| **外部边界组件 (External Entities)** | SaaS (如 GitHub, Google Drive), 外部 LLM 集群, 第三方 MCP 工具 | 位于当前控制域（Trust Boundary）之外的其他系统，具备独立的信任和身份认证机制，不承认内部的 Agent 身份。 | 依赖联合认证 (Federated) 的 OAuth Token 或固定 API Key。 |
+
+### **4.2 认证协议场景分类与应用实践 (Authentication Protocols Usage Scenarios)**
+
+针对 Agentic AI 跨域、多模态的交互特征，必须根据安全上下文采用恰当的认证与授权协议：
+
+#### **A. 边界接入层接入协议 (Ingress / Front-Door Auth)**
+*   **协议标准：** **OAuth 2.0 / OpenID Connect (OIDC)** 结合 **Token Exchange (RFC 8693)**
+*   **应用场景：** 人机交互起点。当终端用户通过 Web/App 发起指令时使用。
+*   **原理剖析：** 外部只处理基于“人类身份”的标准 ID Token。在网关层利用 Token Exchange 将外部 OIDC Token 换取为携带环境审计参数的“内部执行上下文令牌 (Execution Context Token)”，以此切断内部网络对公网直接暴露脆弱身份的风险。
+
+#### **B. 内部机密服务间通信 (Intra-Service A2A Auth)**
+*   **协议标准：** **SPIFFE / SPIRE (SVID) 或 任务级 JWT (Task-scoped Token) + mTLS**
+*   **应用场景：** Orchestrator 分发子任务给 Sub-agent；Agent 请求 Identity Service 获取凭证或查询策略。
+*   **原理剖析：** 核心在于**双向验证身份真实性**与**防抵赖**。不依赖传统的静态密钥。SPIRE 端点通过环境（例如 K8s Pod UID）自动核发周期极短的 SVID，并强制建立基于证书的 mTLS 加密隧道。适用于高频、多并发的机器到机器心跳与数据传输。
+
+#### **C. 基础设施底层受控资源访问 (Infrastructure Resource Auth)**
+*   **协议标准：** **IAM 角色联邦 (Identity Federation) + 请求头签名验证 (如 SigV4)**
+*   **应用场景：** Agent 读取同云服务域内的对象存储引擎 (如 S3)、操作向量数据库 (Vector DB) 或拉起后端内置基础模型 (Foundation Models) 的推理侧。
+*   **原理剖析：** 让 Agent 的概念身份向云原生基础设施（如 STS）投诚。凭借映射后的角色临时安全凭证，所有出站请求通过 HMAC-SHA256 等方式对 Payload 进行非对称加密签名。云提供商在底层边缘节点就能凭借签名完成“鉴权 + 防篡改”拦截，减少上层应用的解析压力和延迟。
+
+#### **D. 平台外服务出站挂载协议 (Outbound External Auth)**
+*   **协议标准：** **OAuth 2.1 客户端凭证类型 (Client Credentials), Bearer Token, 持久化 API Keys**
+*   **应用场景：** Agent 需要代替用户查询企业钉钉/飞书组织架构、调用 Google Drive API 进行代码写入、拉取第三方天气接口。
+*   **原理剖析：** 上述“外部组件”不认同任何内部身份。网关在此发挥作用：Agent 通过出示 A2A 通信令牌向网关请求特定目标，网关核对策略无误后，从保险库脱敏提取对应的 OAuth Access Token 或静态密钥，在 Gateway 出口层通过 Header Injection（隐性挂载）打入请求头。全程确保智能体代码与危险的高价值越界密钥物理绝缘。
+`;
+    };
+
+    const handleDownload = (e) => {
+        e.stopPropagation();
+        const mdContent = generateMarkdown();
+        const blob = new Blob([mdContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Agent_Identity_Auth_Design_Spec.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    const markdownComponents = {
+        h1: ({ node, ...props }) => <h1 className="text-3xl font-black text-slate-900 border-b pb-4 mb-6 mt-2" {...props} />,
+        h2: ({ node, ...props }) => <h2 className="text-2xl font-bold text-slate-800 mt-8 mb-4 border-l-4 border-orange-500 pl-4" {...props} />,
+        h3: ({ node, ...props }) => <h3 className="text-xl font-bold text-slate-700 mt-6 mb-3" {...props} />,
+        h4: ({ node, ...props }) => <h4 className="text-lg font-bold text-slate-700 mt-5 mb-2" {...props} />,
+        p: ({ node, ...props }) => <p className="text-slate-600 leading-relaxed mb-4 text-sm font-medium" {...props} />,
+        ul: ({ node, ...props }) => <ul className="list-disc list-outside ml-6 space-y-2 text-slate-600 mb-6 text-sm" {...props} />,
+        li: ({ node, ...props }) => <li className="pl-1" {...props} />,
+        strong: ({ node, ...props }) => <strong className="font-bold text-orange-600" {...props} />,
+        hr: ({ node, ...props }) => <hr className="my-8 border-slate-100" {...props} />,
+        table: ({ node, ...props }) => (
+            <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm text-left text-slate-600 border border-slate-200" {...props} />
+            </div>
+        ),
+        thead: ({ node, ...props }) => <thead className="text-xs text-slate-700 uppercase bg-slate-100/50" {...props} />,
+        tbody: ({ node, ...props }) => <tbody className="divide-y divide-slate-200" {...props} />,
+        th: ({ node, ...props }) => <th className="px-4 py-3 font-bold bg-slate-50/80 border-b border-slate-200" {...props} />,
+        td: ({ node, ...props }) => <td className="px-4 py-3 align-top leading-relaxed" {...props} />
+    };
+
     const RuntimeContainer = ({ children }) => (
         <div className="p-1.5 bg-indigo-50/50 rounded-[36px] border border-indigo-200/50 shadow-inner flex flex-col items-center relative group overflow-visible">
             <div className="absolute -bottom-2.5 right-6 flex items-center gap-1.5 opacity-40 group-hover:opacity-80 transition-opacity bg-white/80 px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
@@ -218,10 +346,10 @@ const IdentityAuthView = memo(() => {
                                     </div>
                                     {/* 内部模块 */}
                                     <div className="grid grid-cols-4 gap-2">
-                                        <SubComponent icon={BookOpen} label="身份目录" enLabel="IDENTITY DIRECTORY" tooltip="统一维护系统内所有 Agent 实例与集成工具的身份注册元数据，包括名称、别名与关联的授权凭据记录映射中心。" />
-                                        <SubComponent icon={ShieldCheck} label="令牌保险库" enLabel="TOKEN VAULT" tooltip="高度隔离的安全存储服务。负责加密封装保存用于外部 API 调用的高价值密钥、第三方凭证与工具连接令牌。" />
-                                        <SubComponent icon={FileSearch} label="策略检索" enLabel="POLICY RETRIEVAL" tooltip="对接策略存储层，根据请求上下文动态提取对应的访问控制规则 (Policies)，为 Agent 调用资源提供细化到动作级别的策略判决依据。" />
-                                        <SubComponent icon={Zap} label="身份解析器" enLabel="IDENTITY ANALYZER" tooltip="深度解码每次交互请求携带的会话上下文及任务令牌，核实验证来访 Agent 凭证的业务合法性与生命周期连续性。" />
+                                        <SubComponent icon={BookOpen} label="身份服务" enLabel="IDENTITY SERVICE" tooltip="负责统一管理所有 Agent 实例的注册与身份生命周期，提供标准化、可验证的实体身份机制。" />
+                                        <SubComponent icon={ShieldCheck} label="凭证管理" enLabel="CREDENTIAL MGMT" tooltip="高度隔离的安全凭证托管保险库 (Vault)。集中加密存储临时角色与第三方集成的 API 密钥。" />
+                                        <SubComponent icon={FileSearch} label="策略管理" enLabel="POLICY MGMT" tooltip="统一定义和下发原子级访问控制策略，按最小权限原则设定 Agent 允许调用的资源和工具接口。" />
+                                        <SubComponent icon={Zap} label="身份解析" enLabel="IDENTITY ANALYZER" tooltip="深度提取和剖析交互请求携带的上下文令牌，校验请求凭证合法性并防御伪造攻击。" />
                                     </div>
                                 </div>
 
@@ -380,6 +508,49 @@ const IdentityAuthView = memo(() => {
                     />
                 </div>
             </Xwrapper>
+
+            {/* 架构设计文档演示区域 */}
+            <div className="mt-16 pt-8 border-t border-slate-200">
+                <div
+                    className="flex items-center justify-between mb-6 cursor-pointer hover:bg-slate-100/50 p-3 rounded-2xl transition-all select-none group"
+                    onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl border border-orange-100 group-hover:scale-110 transition-transform">
+                            <FileText className="w-6 h-6" />
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-2xl font-black text-slate-800 tracking-tight">身份认证与授权架构设计文档</h3>
+                            {isDescriptionOpen ?
+                                <ChevronUp className="w-6 h-6 text-slate-400" /> :
+                                <ChevronDown className="w-6 h-6 text-slate-400" />
+                            }
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleDownload}
+                            className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 font-bold text-sm"
+                        >
+                            <Download className="w-4 h-4" />
+                            下载文档
+                        </button>
+                    </div>
+                </div>
+
+                {isDescriptionOpen && (
+                    <div className="bg-white rounded-[32px] border border-slate-200 p-10 shadow-xl animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div className="max-w-4xl mx-auto prose prose-slate prose-orange">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={markdownComponents}
+                            >
+                                {generateMarkdown()}
+                            </ReactMarkdown>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 });
